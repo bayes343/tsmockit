@@ -1,0 +1,20 @@
+{
+  "name": "tsmock",
+  "author": {
+    "name": "Joseph Bayes"
+  },
+  "keywords": [
+    "mock",
+    "mocking",
+    "testing",
+    "unit testing",
+    "typescript",
+    "generic"
+  ],
+  "license": "MIT",
+  "version": "1.0.0",
+  "description": "TypeScript mocking library",
+  "private": false,
+  "main": "./public_api.js",
+  "types": "./public_api.d.ts"
+}
