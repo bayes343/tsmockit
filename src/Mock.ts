@@ -8,17 +8,31 @@ export class Mock<T> {
     return this.object;
   }
 
-  public Setup(operation: string, returns: (() => any)): void {
-    (this.object as any)[operation] = (() => {
-      this.callTimesMap[operation]++;
-      return returns();
-    });
+  // public Setup(operation: (func: T) => any, returns: (() => any)): void {
+  //   const operationString = this.getPropertyName(operation);
 
-    this.callTimesMap[operation] = 0;
-  }
+  //   (this.object as any)[operationString] = (() => {
+  //     this.callTimesMap[operationString]++;
+  //     return returns();
+  //   });
 
-  public Verify(operation: string, times: Times | number): void {
-    expect(this.callTimesMap[operation]).toEqual(times);
-  }
+  //   this.callTimesMap[operationString] = 0;
+  // }
+
+  // public Verify(operation: string, times: Times | number): void {
+  //   expect(this.callTimesMap[operation]).toEqual(times);
+  // }
+
+  // private getPropertyName(value: (obj: T) => any): string {
+  //   let name = '';
+    
+  //   const propertyNameMatches = value.toString().match(/return\s[\w\d_]*\.([\w\d$_]*)\;/);
+  //   console.log(propertyNameMatches);
+  //   if (propertyNameMatches && propertyNameMatches[1]) {
+  //     name = propertyNameMatches[1];
+  //   }
+
+  //   return name;
+  // }
 
 }
