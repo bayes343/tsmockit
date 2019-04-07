@@ -6,15 +6,21 @@ class TestClass {
   public get Test(): string {
     return this.test;
   }
-  private test1 = '';
+  private test1: string;
   public get Test1(): string {
     return this.test1;
+  }
+
+  constructor(test1?: string) {
+    this.test1 = test1 ? test1 : '';
   }
 }
 
 interface ITestInterface {
   GetStringFromInt(int: number): string;
   GetTestClassProperty(testClass: TestClass): string;
+  GetNumberFromSomeStuff(json: { one: 1, two: 2 }, testClass: TestClass, num: number): number;
+  GetAString(): string;
 }
 
 describe('Mock<T>', () => {
@@ -25,11 +31,16 @@ describe('Mock<T>', () => {
     mockITestInterface.Setup(i => i.GetStringFromInt(1), () => 'Test');
   });
 
-  // it('should blah', () => {
-  //   mockITestInterface.Setup(i => i.GetTestClassProperty(new TestClass()), () => 'test');
-  //   const testPropertyValue = mockITestInterface.Object.GetTestClassProperty(new TestClass());
-  //   console.log(testPropertyValue);
-  // });
+  it('should setup operations to resolve based on the state of the params entered', () => {
+    mockITestInterface.Setup(i => i.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass(), 1), () => 1);
+    mockITestInterface.Setup(i => i.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass('test'), 1), () => 2);
+
+    const testPropertyValue = mockITestInterface.Object.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass(), 1);
+    const testPropertyValue1 = mockITestInterface.Object.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass('test'), 1);
+
+    expect(testPropertyValue).toEqual(1);
+    expect(testPropertyValue1).toEqual(2);
+  });
 
   it('should return \"Test\" when GetString is called', () => {
     const actual = mockITestInterface.Object.GetStringFromInt(1);
@@ -67,4 +78,11 @@ describe('Mock<T>', () => {
     expect(mockITestInterface.Object.GetStringFromInt(1)).toEqual('1');
     expect(mockITestInterface.Object.GetStringFromInt(2)).toEqual('2');
   });
+
+  it('should setup a method that has no params', () => {
+    mockITestInterface.Setup(i => i.GetAString(), () => 'string');
+    const actual = mockITestInterface.Object.GetAString();
+    expect(actual).toEqual('string');
+  });
+
 });
