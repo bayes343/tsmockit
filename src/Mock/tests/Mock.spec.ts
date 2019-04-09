@@ -17,10 +17,30 @@ class TestClass {
 }
 
 interface ITestInterface {
+  StringProperty: string;
   GetStringFromInt(int: number): string;
-  GetTestClassProperty(testClass: TestClass): string;
   GetNumberFromSomeStuff(json: { one: 1, two: 2 }, testClass: TestClass, num: number): number;
   GetAString(): string;
+}
+
+class DiTest {
+  private dependency: ITestInterface;
+
+  constructor(dependency: ITestInterface) {
+    this.dependency = dependency;
+  }
+
+  GetStringFromInt(int: number): string {
+    return this.dependency.GetStringFromInt(int);
+  }
+
+  GetNumberFromSomeStuff(json: { one: 1, two: 2 }, testClass: TestClass, num: number): number {
+    return this.dependency.GetNumberFromSomeStuff(json, testClass, num);
+  }
+
+  GetAString(): string {
+    return this.dependency.GetAString();
+  }
 }
 
 describe('Mock<T>', () => {
@@ -28,12 +48,12 @@ describe('Mock<T>', () => {
 
   beforeEach(() => {
     mockITestInterface = new Mock<ITestInterface>();
-    mockITestInterface.Setup(i => i.GetStringFromInt(1), () => 'Test');
+    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'Test');
   });
 
   it('should setup operations to resolve based on the state of the params entered', () => {
-    mockITestInterface.Setup(i => i.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass(), 1), () => 1);
-    mockITestInterface.Setup(i => i.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass('test'), 1), () => 2);
+    mockITestInterface.Setup(i => i.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass(), 1), 1);
+    mockITestInterface.Setup(i => i.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass('test'), 1), 2);
 
     const testPropertyValue = mockITestInterface.Object.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass(), 1);
     const testPropertyValue1 = mockITestInterface.Object.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass('test'), 1);
@@ -48,7 +68,7 @@ describe('Mock<T>', () => {
   });
 
   it('should return \"Test2\" when GetString called after setup is changed', () => {
-    mockITestInterface.Setup(i => i.GetStringFromInt(1), () => 'Test2');
+    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'Test2');
     const actual = mockITestInterface.Object.GetStringFromInt(1);
     expect(actual).toEqual('Test2');
   });
@@ -70,9 +90,9 @@ describe('Mock<T>', () => {
   });
 
   it('should handle multiple setups for the same operation', () => {
-    mockITestInterface.Setup(i => i.GetStringFromInt(3), () => '3');
-    mockITestInterface.Setup(i => i.GetStringFromInt(1), () => '1');
-    mockITestInterface.Setup(i => i.GetStringFromInt(2), () => '2');
+    mockITestInterface.Setup(i => i.GetStringFromInt(3), '3');
+    mockITestInterface.Setup(i => i.GetStringFromInt(1), '1');
+    mockITestInterface.Setup(i => i.GetStringFromInt(2), '2');
 
     expect(mockITestInterface.Object.GetStringFromInt(3)).toEqual('3');
     expect(mockITestInterface.Object.GetStringFromInt(1)).toEqual('1');
@@ -80,9 +100,29 @@ describe('Mock<T>', () => {
   });
 
   it('should setup a method that has no params', () => {
-    mockITestInterface.Setup(i => i.GetAString(), () => 'string');
+    mockITestInterface.Setup(i => i.GetAString(), 'string');
     const actual = mockITestInterface.Object.GetAString();
     expect(actual).toEqual('string');
+  });
+
+  it('should setup and verify a dependency in a common di scenario', () => {
+    mockITestInterface.Setup(i => i.GetAString(), 'string');
+    mockITestInterface.Setup(i => i.GetStringFromInt(3), '3');
+    mockITestInterface.Setup(i => i.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass('test'), 1), 2);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetAString()).toEqual('string');
+    expect(classInstance.GetStringFromInt(3)).toEqual('3');
+    expect(classInstance.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass('test'), 1)).toEqual(2);
+
+    mockITestInterface.Verify(i => i.GetAString(), 1);
+    mockITestInterface.Verify(i => i.GetStringFromInt(3), 1);
+    mockITestInterface.Verify(i => i.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass('test'), 1), 1);
+  });
+
+  it('should mock properties', () => {
+    mockITestInterface.Setup(i => i.StringProperty, 'string');
+    expect(mockITestInterface.Object.StringProperty).toEqual('string');
   });
 
 });

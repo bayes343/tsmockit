@@ -2,4 +2,4 @@
  * Public API Surface of tsmock
  */
 
-export * from './Mock';
+export * from './Mock/Mock';
