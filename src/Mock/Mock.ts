@@ -10,7 +10,7 @@ export class Mock<T> {
     return this.object;
   }
 
-  public Setup(member: (func: T) => any, returns: any): void {
+  public Setup(member: (func: T) => any, returns: any = null): void {
     const memberSignatureMap = SignatureService.GetMemberSignatureMap(member, returns);
     this.updateMemberSignatureMaps(memberSignatureMap);
 
@@ -24,6 +24,14 @@ export class Mock<T> {
         return returnFunction ? returnFunction() : (() => console.error('Unable to resolve setup function'))();
       });
     }
+  }
+
+  public Verify(member: (func: T) => any, times: Times | number): void {
+    const memberSignature = SignatureService.GetMemberSignatureMap(member);
+    const functionMap: FunctionMap | undefined = this.getFunctionMapFromSignatureMap(memberSignature);
+    const timesCalled = functionMap ? functionMap.timesCalled : 0;
+
+    expect(timesCalled).toEqual(times);
   }
 
   private getReturnsValueForProperty(memberSignatureMap: SignatureMap): any {
@@ -41,24 +49,18 @@ export class Mock<T> {
     let returnFunction: Function | undefined;
     const existingMemberSignatureMap = this.memberSignatureMaps.find(s => s.signature === memberSignatureMap.signature);
 
-    if (existingMemberSignatureMap && memberSignatureMap.functionMaps[0]) {
-      const functionMap = existingMemberSignatureMap.functionMaps.find(m => JSON.stringify(m.state) === JSON.stringify(args));
+    const defaultFunctionMap = memberSignatureMap.functionMaps[0];
+    if (existingMemberSignatureMap && defaultFunctionMap) {
+      const exactFunctionMap = existingMemberSignatureMap.functionMaps.find(m => JSON.stringify(m.state) === JSON.stringify(args));
+      const functionMap = exactFunctionMap ? exactFunctionMap : defaultFunctionMap;
 
-      returnFunction = functionMap ? (() => {
+      returnFunction = (() => {
         functionMap.timesCalled++;
         return functionMap.returns;
-      }) : undefined;
+      });
     }
 
     return returnFunction;
-  }
-
-  public Verify(member: (func: T) => any, times: Times | number): void {
-    const memberSignature = SignatureService.GetMemberSignatureMap(member);
-    const functionMap: FunctionMap | undefined = this.getFunctionMapFromSignatureMap(memberSignature);
-    const timesCalled = functionMap ? functionMap.timesCalled : 0;
-
-    expect(timesCalled).toEqual(times);
   }
 
   private updateMemberSignatureMaps(memberSignatureMap: SignatureMap) {

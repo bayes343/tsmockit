@@ -6,6 +6,10 @@
   "private": true,
   "author": "Joseph Bayes",
   "license": "ISC",
+  "repository": {
+    "type": "Azure Repos",
+    "url": "https://dev.azure.com/joseph-w-bayes/_git/tsmock"
+  },
   "scripts": {
     "test": "karma start",
     "test-once": "karma start --singleRun",
