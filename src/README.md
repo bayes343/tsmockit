@@ -1,4 +1,4 @@
-# tsmock
+# tsmockit
 *Easy to use generic mocking library*
 
 This library exposes a single generic class, `Mock<T>`, which allows you to mock dependencies and verify usage in an intuitive and type safe manner.
@@ -85,7 +85,7 @@ The `Car` class above uses dependency injection for its engine, odometer, and st
 It's a best practice to use dependency injection over 'newing' up concretions inside a class instance.  This allows true unit testing as well as widely opening the door to future extendability.
 
 ### Example
-Here's how you would use `tsmock` to mock the above dependencies and test the `Car` class.
+Here's how you would use `tsmockit` to mock the above dependencies and test the `Car` class.
 
 ```ts
 // Instantiate mocks

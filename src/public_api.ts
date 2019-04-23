@@ -1,5 +1,5 @@
 /*
- * Public API Surface of tsmock
+ * Public API Surface of tsmockit
  */
 
 export * from './Mock/Mock';

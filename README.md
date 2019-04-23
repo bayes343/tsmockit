@@ -1,8 +1,8 @@
-# tsmock Quickstart
+# tsmockit Quickstart
 
 [![Build status](https://dev.azure.com/joseph-w-bayes/tsmock/_apis/build/status/tsmock-CI)](https://dev.azure.com/joseph-w-bayes/tsmock/_build/latest?definitionId=17)
 
-The public facing readme is located in the `src` directory.  This readme is intended for maintainers / constributors to tsmock.
+The public facing readme is located in the `src` directory.  This readme is intended for maintainers / constributors to tsmockit.
 
 ## Local Development
 
