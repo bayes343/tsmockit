@@ -7,8 +7,8 @@ export class SignatureService {
     let memberSignature = '';
 
     memberSignature =
-      this.getPropertyMemberSignature(value, memberSignature) ||
-      this.getOperationMemberSignature(value, memberSignature);
+      this.getOperationMemberSignature(value, memberSignature) ||
+      this.getPropertyMemberSignature(value, memberSignature);
 
     const state = this.MemberSignatureIsProperty(memberSignature) ? '' :
       SignatureService.getStateForMemberSignature(memberSignature, value);

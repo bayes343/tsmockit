@@ -18,6 +18,7 @@ class TestClass {
 
 interface ITestInterface {
   StringProperty: string;
+  StringsProperty: Array<string>;
   GetStringFromInt(int: number): string;
   GetNumberFromSomeStuff(json: { one: 1, two: 2 }, testClass: TestClass, num: number): number;
   GetAString(): string;
@@ -123,6 +124,15 @@ describe('Mock<T>', () => {
   it('should mock properties', () => {
     mockITestInterface.Setup(i => i.StringProperty, 'string');
     expect(mockITestInterface.Object.StringProperty).toEqual('string');
+
+    const strings = ['one', 'two'];
+    mockITestInterface.Setup(i => i.StringsProperty, strings);
+    expect(mockITestInterface.Object.StringsProperty).toEqual(strings);
+  });
+
+  it('should mock operations', () => {
+    mockITestInterface.Setup(i => i.GetAString(), 'string');
+    expect(mockITestInterface.Object.GetAString()).toEqual('string');
   });
 
 });
