@@ -15,6 +15,11 @@ Setup(
   ): void
 ```
 ```ts
+TimesMemberCalled(
+  member: (func: T) => any
+  ): number
+```
+```ts
 Verify(
   member: (func: T) => any,
   times: Times | number

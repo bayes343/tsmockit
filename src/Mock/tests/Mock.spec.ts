@@ -135,4 +135,27 @@ describe('Mock<T>', () => {
     expect(mockITestInterface.Object.GetAString()).toEqual('string');
   });
 
+  it('should return the call count for a member that was called', () => {
+    mockITestInterface.Setup(i => i.GetAString(), 'string');
+    const classInstance = new DiTest(mockITestInterface.Object);
+    for (let i = 0; i < 3; i++) {
+      classInstance.GetAString();
+    }
+
+    const callCount = mockITestInterface.TimesMemberCalled(i => i.GetAString());
+
+    expect(callCount).toEqual(3);
+  });
+
+  it('should return 0 for a member that was not called', () => {
+    mockITestInterface.Setup(i => i.GetAString(), 'string');
+    mockITestInterface.Setup(i => i.GetStringFromInt(3), '3');
+    const classInstance = new DiTest(mockITestInterface.Object);
+    classInstance.GetStringFromInt(4);
+
+    const callCount = mockITestInterface.TimesMemberCalled(i => i.GetAString());
+
+    expect(callCount).toEqual(0);
+  });
+
 });

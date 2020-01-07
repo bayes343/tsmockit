@@ -26,10 +26,16 @@ export class Mock<T> {
     }
   }
 
-  public Verify(member: (func: T) => any, times: Times | number): void {
+  public TimesMemberCalled(member: (func: T) => any): number {
     const memberSignature = SignatureService.GetMemberSignatureMap(member);
     const functionMap: FunctionMap | undefined = this.getFunctionMapFromSignatureMap(memberSignature);
     const timesCalled = functionMap ? functionMap.timesCalled : 0;
+
+    return timesCalled;
+  }
+
+  public Verify(member: (func: T) => any, times: Times | number): void {
+    const timesCalled = this.TimesMemberCalled(member);
 
     expect(timesCalled).toEqual(times);
   }
