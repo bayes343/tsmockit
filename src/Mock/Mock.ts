@@ -21,7 +21,8 @@ export class Mock<T> {
 
       (this.object as any)[memberName] = ((...args: any) => {
         const returnFunction: any = this.getReturnsForFunction(memberSignatureMap, args);
-        return returnFunction ? returnFunction() : (() => console.error('Unable to resolve setup function'))();
+        return returnFunction ? returnFunction() :
+          (() => console.error('Unable to resolve setup function'))();
       });
     }
   }
@@ -57,7 +58,8 @@ export class Mock<T> {
 
     const defaultFunctionMap = memberSignatureMap.functionMaps[0];
     if (existingMemberSignatureMap && defaultFunctionMap) {
-      const exactFunctionMap = existingMemberSignatureMap.functionMaps.find(m => JSON.stringify(m.state) === JSON.stringify(args));
+      const exactFunctionMap = existingMemberSignatureMap.functionMaps.find(
+        m => JSON.stringify(m.state) === JSON.stringify(args));
       const functionMap = exactFunctionMap ? exactFunctionMap : defaultFunctionMap;
 
       returnFunction = (() => {
@@ -104,7 +106,8 @@ export class Mock<T> {
       if (functionMapCount === 1) {
         functionMap = existingMember.functionMaps[0];
       } else {
-        functionMap = existingMember.functionMaps.find(m => JSON.stringify(m.state) === JSON.stringify(functionMapToFind.state));
+        functionMap = existingMember.functionMaps.find(
+          m => JSON.stringify(m.state) === JSON.stringify(functionMapToFind.state));
       }
     }
 

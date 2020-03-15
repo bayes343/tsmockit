@@ -17,7 +17,7 @@
     "tsc": "tsc && npm run clean",
     "copy-docs": "cp ./src/README.md dist && cp ./src/License.md dist && cp ./src/package.json dist && npm build dist",
     "build": "npm run tsc && npm run copy-docs && npm build dist",
-    "lint": "tslint --project ./tsconfig.json",
+    "lint": "eslint src/**/*.ts",
     "package": "rm -rf dist && npm run build",
     "publish": "cd dist && npm publish"
   },
@@ -33,11 +33,13 @@
     "karma-typescript": "^3.0.13",
     "puppeteer": "^1.14.0",
     "typescript": "^3.8.0",
-    "tslint": "~5.9.1",
     "@types/es6-promise": "^3.3.0",
     "@types/node": "^10.14.4",
     "karma-junit-reporter": "^1.2.0",
     "karma-phantomjs-launcher": "^1.0.4",
-    "tslib": "^1.9.3"
+    "tslib": "^1.9.3",
+    "@typescript-eslint/eslint-plugin": "^2.15.0",
+    "@typescript-eslint/parser": "^2.15.0",
+    "eslint": "^6.8.0"
   }
 }

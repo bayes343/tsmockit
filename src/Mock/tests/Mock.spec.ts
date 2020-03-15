@@ -57,7 +57,8 @@ describe('Mock<T>', () => {
     mockITestInterface.Setup(i => i.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass('test'), 1), 2);
 
     const testPropertyValue = mockITestInterface.Object.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass(), 1);
-    const testPropertyValue1 = mockITestInterface.Object.GetNumberFromSomeStuff({ one: 1, two: 2 }, new TestClass('test'), 1);
+    const testPropertyValue1 = mockITestInterface.Object.GetNumberFromSomeStuff(
+      { one: 1, two: 2 }, new TestClass('test'), 1);
 
     expect(testPropertyValue).toEqual(1);
     expect(testPropertyValue1).toEqual(2);
