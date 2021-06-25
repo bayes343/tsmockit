@@ -1,29 +1,46 @@
 # tsmockit
 *Easy to use generic mocking library*
 
-This library exposes a single generic class, `Mock<T>`, which allows you to mock dependencies and verify usage in an intuitive and type safe manner.
+This library exposes a generic class, `Mock<T>`, which allows you to mock dependencies and verify usage in an intuitive and type safe manner.
 
 Public interface:
 
-```ts
+```typescript
 class Mock<T>
 ```
-```ts
+```typescript
 Setup(
   member: (func: T) => any,
   returns: any = null
-  ): void
+): void
 ```
-```ts
+```typescript
 TimesMemberCalled(
   member: (func: T) => any
-  ): number
+): number
 ```
-```ts
+```typescript
 Verify(
   member: (func: T) => any,
   times: Times | number
-  ): void
+): void
+```
+
+```typescript
+class TestHelpers
+```
+```typescript
+static EmitEventAtElement(element: HTMLElement, eventType: string): void
+```
+```typescript
+static EmitKeyEventAtElement(
+  element: HTMLInputElement,
+  key: string,
+  keyEvent: 'keydown' | 'keypress' | 'keyup' | 'input'
+): void
+```
+```typescript
+static async TimeLapsedCondition(condition: () => boolean, interval = 10): Promise<boolean>
 ```
 
 ## Usage

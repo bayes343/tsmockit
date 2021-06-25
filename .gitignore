@@ -3,3 +3,4 @@ coverage
 dist
 *debug.log
 TESTS-*
+.DS_Store
