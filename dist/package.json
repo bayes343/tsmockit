@@ -15,7 +15,7 @@
   ],
   "license": "MIT",
   "version": "1.1.0",
-  "description": "TypeScript generic mocking library",
+  "description": "Generic mocking library for TypeScript",
   "private": false,
   "main": "./public_api.js",
   "types": "./public_api.d.ts"

@@ -1,6 +1,8 @@
 node_modules
 coverage
-dist
 *debug.log
 TESTS-*
 .DS_Store
+dist/**/*.js
+dist/**/*.ts
+dist/**/*.map

@@ -1,25 +1,17 @@
 {
-  "name": "tsmockit-dev",
+  "name": "tsmockit",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "private": true,
   "author": "Joseph Bayes",
-  "license": "ISC",
-  "repository": {
-    "type": "Azure Repos",
-    "url": "https://dev.azure.com/joseph-w-bayes/_git/tsmock"
-  },
+  "license": "MIT",
   "scripts": {
-    "test": "karma start",
+    "start": "karma start",
     "test-once": "karma start --singleRun",
-    "clean": "rm -r dist/**/tests",
     "tsc": "tsc && npm run clean",
-    "copy-docs": "cp ./src/README.md dist && cp ./src/License.md dist && cp ./src/package.json dist && npm build dist",
-    "build": "npm run tsc && npm run copy-docs && npm build dist",
-    "lint": "eslint src/**/*.ts",
-    "package": "rm -rf dist && npm run build",
-    "publish": "cd dist && npm publish"
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts"
   },
   "devDependencies": {
     "@types/core-js": "^2.5.3",

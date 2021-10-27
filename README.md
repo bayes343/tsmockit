@@ -1,22 +1,19 @@
-# tsmockit Quickstart
-
-[![Build status](https://dev.azure.com/joseph-w-bayes/tsmock/_apis/build/status/tsmock-CI)](https://dev.azure.com/joseph-w-bayes/tsmock/_build/latest?definitionId=17)
-
-The public facing readme is located in the `src` directory.  This readme is intended for maintainers / constributors to tsmockit.
+# tsmockit
+The public facing readme is located in the `dist` directory.  This readme is intended for maintainers / contributors to tsmockit.
 
 ## Local Development
-
-### Pre-requisites
-- node/npm
-
 ### Installation
 - run cmd: `npm install`
 
 ### Testing
-- run cmd: `npm run test` / `karma start`
+- run cmd: `npm start` / `npm run test-once`
 
 ### Linting
 - run cmd: `npm run lint`
 
 ### Building
 - run cmd `npm run build`
+
+### Publishing
+- Merge a PR to master
+- If the version is updated, a github action will handle publishing the new version
