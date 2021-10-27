@@ -1,6 +1,10 @@
 # tsmockit
 Generic mocking library for TypeScript
 
+Helpful links:
+- [GitHub](https://github.com/bayes343/tsmockit)
+- [npm](https://www.npmjs.com/package/tsmockit)
+
 This library exposes a generic class, `Mock<T>`, which allows you to mock dependencies and verify usage in an intuitive and type safe manner.
 
 Public interface:
