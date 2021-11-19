@@ -1,6 +1,10 @@
 # tsmockit
 Generic mocking library for TypeScript
 
+[![CI](https://github.com/bayes343/tsmockit/actions/workflows/ci.yml/badge.svg)](https://github.com/bayes343/tsmockit/actions/workflows/ci.yml)
+![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/bayes343/tsmockit.svg?logo=lgtm&logoWidth=18)
+
+
 Helpful links:
 - [GitHub](https://github.com/bayes343/tsmockit)
 - [npm](https://www.npmjs.com/package/tsmockit)
