@@ -2,6 +2,7 @@
 Generic mocking library for TypeScript
 
 [![CI](https://github.com/bayes343/tsmockit/actions/workflows/ci.yml/badge.svg)](https://github.com/bayes343/tsmockit/actions/workflows/ci.yml)
+![Code Coverage](https://img.shields.io/badge/Code%20Coverage-99%25-success?style=flat)
 ![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/bayes343/tsmockit.svg?logo=lgtm&logoWidth=18)
 
 
