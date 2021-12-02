@@ -11,7 +11,8 @@
     "test-once": "karma start --singleRun",
     "tsc": "tsc && npm run clean",
     "build": "tsc",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint ./src --ext .ts,.tsx",
+    "lint-fix": "eslint ./src --ext .ts,.tsx --fix"
   },
   "devDependencies": {
     "@types/core-js": "^2.5.3",
