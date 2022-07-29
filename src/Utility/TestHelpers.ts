@@ -1,7 +1,4 @@
 export class TestHelpers {
-  // eslint-disable-next-line no-empty-function
-  private constructor() { }
-
   /**
    * Emit an event at a given element
    * @param element
