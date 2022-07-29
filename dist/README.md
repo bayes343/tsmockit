@@ -48,7 +48,12 @@ static EmitKeyEventAtElement(
 ): void
 ```
 ```typescript
-static async TimeLapsedCondition(condition: () => boolean, interval = 10): Promise<boolean>
+static async Expect<T>(
+  selector: () => T,
+  assertion: (m: jasmine.Matchers<T>) => void,
+  interval = 0,
+  getTimeFunc = () => Date.now()
+): Promise<void>
 ```
 
 ## Usage
