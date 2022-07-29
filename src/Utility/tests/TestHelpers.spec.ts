@@ -32,4 +32,28 @@ describe('TestHelpers', () => {
 
     expect(variableIsTrue).toBeTruthy();
   });
+
+  it('should execute an async to be truthy assertion', async () => {
+    let variable = false;
+    setTimeout(() => {
+      variable = true;
+    }, 5);
+
+    await TestHelpers.Expect(
+      () => variable,
+      (m => m.toBeTruthy())
+    );
+  });
+
+  it('should execute an async to equal assertion', async () => {
+    let variable = 'one';
+    setTimeout(() => {
+      variable = 'two';
+    }, 5);
+
+    await TestHelpers.Expect(
+      () => variable !== 'one' ? variable : null,
+      (m => m.toEqual('two'))
+    );
+  });
 });
