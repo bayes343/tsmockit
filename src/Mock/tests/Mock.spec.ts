@@ -159,4 +159,22 @@ describe('Mock<T>', () => {
     expect(callCount).toEqual(0);
   });
 
+  it('should default to the first setup when exact match is not found', () => {
+    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one');
+    mockITestInterface.Setup(i => i.GetStringFromInt(3), 'three');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    classInstance.GetStringFromInt(2);
+
+    mockITestInterface.Verify(i => i.GetStringFromInt(2), Times.Once);
+  });
+
+  it('should NOT default to the first setup when true was passed to setup exactSignatureMatch param', () => {
+    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one', true);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    classInstance.GetStringFromInt(2);
+
+    mockITestInterface.Verify(i => i.GetStringFromInt(2), Times.Never);
+  });
 });

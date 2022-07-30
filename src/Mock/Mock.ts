@@ -18,11 +18,8 @@ export class Mock<T> {
     if (SignatureService.MemberSignatureIsProperty(memberSignatureMap.signature)) {
       (this.object as any)[memberName] = this.getReturnsValueForProperty(memberSignatureMap);
     } else {
-
       (this.object as any)[memberName] = ((...args: any) => {
-        const returnFunction: any = this.getReturnsForFunction(memberSignatureMap, args, exactSignatureMatch);
-        return returnFunction ? returnFunction() :
-          (() => console.error('Unable to resolve setup function'))();
+        return this.getReturnsForFunction(memberSignatureMap, args, exactSignatureMatch)?.();
       });
     }
   }
@@ -57,22 +54,18 @@ export class Mock<T> {
     args: any,
     exactSignatureMatch: boolean
   ): Function | undefined {
-    let returnFunction: Function | undefined;
-    const existingMemberSignatureMap = this.memberSignatureMaps.find(s => s.signature === memberSignatureMap.signature);
+    const existingMemberSignatureMap = this.memberSignatureMaps.find(
+      s => s.signature === memberSignatureMap.signature);
+    const exactFunctionMap = existingMemberSignatureMap?.functionMaps.find(
+      m => JSON.stringify(m.state) === JSON.stringify(args));
+    const defaultFunctionMap = exactSignatureMatch ? undefined : existingMemberSignatureMap?.functionMaps[0];
 
-    const defaultFunctionMap = exactSignatureMatch ? undefined : memberSignatureMap.functionMaps[0];
-    if (existingMemberSignatureMap) {
-      const exactFunctionMap = existingMemberSignatureMap.functionMaps.find(
-        m => JSON.stringify(m.state) === JSON.stringify(args));
-      const functionMap = exactFunctionMap ? exactFunctionMap : defaultFunctionMap;
+    const functionMap = exactFunctionMap || defaultFunctionMap;
 
-      returnFunction = functionMap ? (() => {
-        functionMap.timesCalled++;
-        return functionMap.returns;
-      }) : undefined;
-    }
-
-    return returnFunction;
+    return functionMap ? (() => {
+      functionMap.timesCalled++;
+      return functionMap.returns;
+    }) : undefined;
   }
 
   private updateMemberSignatureMaps(memberSignatureMap: SignatureMap) {
@@ -99,23 +92,12 @@ export class Mock<T> {
     }
   }
 
-  private getFunctionMapFromSignatureMap(memberSignature: SignatureMap) {
-    let functionMap: FunctionMap | undefined;
-
+  private getFunctionMapFromSignatureMap(memberSignature: SignatureMap): FunctionMap | undefined {
     const existingMember = this.memberSignatureMaps.find(m => m.signature === memberSignature.signature);
     const functionMapToFind = memberSignature.functionMaps[0];
 
-    if (existingMember && functionMapToFind) {
-      const functionMapCount = existingMember.functionMaps ? existingMember.functionMaps.length : 0;
-      if (functionMapCount === 1) {
-        functionMap = existingMember.functionMaps[0];
-      } else {
-        functionMap = existingMember.functionMaps.find(
-          m => JSON.stringify(m.state) === JSON.stringify(functionMapToFind.state));
-      }
-    }
-
-    return functionMap;
+    return existingMember?.functionMaps.find(
+      m => JSON.stringify(m.state) === JSON.stringify(functionMapToFind.state)) ||
+      existingMember?.functionMaps[0];
   }
-
 }
