@@ -10,7 +10,7 @@ export class Mock<T> {
     return this.object;
   }
 
-  public Setup(member: (func: T) => any, returns: any = null): void {
+  public Setup(member: (func: T) => any, returns: any = null, exactSignatureMatch = false): void {
     const memberSignatureMap = SignatureService.GetMemberSignatureMap(member, returns);
     this.updateMemberSignatureMaps(memberSignatureMap);
 
@@ -20,7 +20,7 @@ export class Mock<T> {
     } else {
 
       (this.object as any)[memberName] = ((...args: any) => {
-        const returnFunction: any = this.getReturnsForFunction(memberSignatureMap, args);
+        const returnFunction: any = this.getReturnsForFunction(memberSignatureMap, args, exactSignatureMatch);
         return returnFunction ? returnFunction() :
           (() => console.error('Unable to resolve setup function'))();
       });
@@ -52,20 +52,24 @@ export class Mock<T> {
     return value;
   }
 
-  private getReturnsForFunction(memberSignatureMap: SignatureMap, args: any): Function | undefined {
+  private getReturnsForFunction(
+    memberSignatureMap: SignatureMap,
+    args: any,
+    exactSignatureMatch: boolean
+  ): Function | undefined {
     let returnFunction: Function | undefined;
     const existingMemberSignatureMap = this.memberSignatureMaps.find(s => s.signature === memberSignatureMap.signature);
 
-    const defaultFunctionMap = memberSignatureMap.functionMaps[0];
-    if (existingMemberSignatureMap && defaultFunctionMap) {
+    const defaultFunctionMap = exactSignatureMatch ? undefined : memberSignatureMap.functionMaps[0];
+    if (existingMemberSignatureMap) {
       const exactFunctionMap = existingMemberSignatureMap.functionMaps.find(
         m => JSON.stringify(m.state) === JSON.stringify(args));
       const functionMap = exactFunctionMap ? exactFunctionMap : defaultFunctionMap;
 
-      returnFunction = (() => {
+      returnFunction = functionMap ? (() => {
         functionMap.timesCalled++;
         return functionMap.returns;
-      });
+      }) : undefined;
     }
 
     return returnFunction;
