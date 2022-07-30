@@ -11,7 +11,7 @@ export class Mock<T> {
   }
 
   public Setup(member: (func: T) => any, returns: any = null, exactSignatureMatch = false): void {
-    const memberSignatureMap = SignatureService.GetMemberSignatureMap(member, returns);
+    const memberSignatureMap = SignatureService.GetMemberSignatureMap(member, returns, exactSignatureMatch);
     this.updateMemberSignatureMaps(memberSignatureMap);
 
     const memberName = SignatureService.GetMemberNameFromSignature(memberSignatureMap.signature);
@@ -58,7 +58,7 @@ export class Mock<T> {
       s => s.signature === memberSignatureMap.signature);
     const exactFunctionMap = existingMemberSignatureMap?.functionMaps.find(
       m => JSON.stringify(m.state) === JSON.stringify(args));
-    const defaultFunctionMap = exactSignatureMatch ? undefined : existingMemberSignatureMap?.functionMaps[0];
+    const defaultFunctionMap = exactSignatureMatch ? undefined : existingMemberSignatureMap?.functionMaps.find(m => m.default);
 
     const functionMap = exactFunctionMap || defaultFunctionMap;
 
@@ -98,6 +98,6 @@ export class Mock<T> {
 
     return existingMember?.functionMaps.find(
       m => JSON.stringify(m.state) === JSON.stringify(functionMapToFind.state)) ||
-      existingMember?.functionMaps[0];
+      existingMember?.functionMaps.find(m => m.default);
   }
 }
