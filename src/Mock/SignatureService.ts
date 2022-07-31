@@ -1,8 +1,7 @@
-import { SignatureMap } from './TypeLiterals';
 import { Regex } from './Constants';
+import { SignatureMap } from './SignatureMap';
 
 export class SignatureService {
-
   public static GetMemberSignatureMap(value: (obj: any) => any, returns?: any, exactSignatureMatch = false): SignatureMap {
     let memberSignature = '';
 

@@ -1,6 +1,7 @@
 import { Times } from './Times';
-import { SignatureMap, FunctionMap } from './TypeLiterals';
 import { SignatureService } from './SignatureService';
+import { FunctionMap } from './FunctionMap';
+import { SignatureMap } from './SignatureMap';
 
 export class Mock<T> {
   private memberSignatureMaps = new Array<SignatureMap>();

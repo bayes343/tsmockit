@@ -4,8 +4,3 @@ export type FunctionMap = {
   returns: Function,
   timesCalled: number
 };
-
-export type SignatureMap = {
-  signature: string,
-  functionMaps: Array<FunctionMap>
-};
