@@ -253,4 +253,14 @@ describe('Mock<T>', () => {
     expect(actual).toEqual(2);
     mockITestInterface.Verify(i => i.GetSumFromNumbers(2, Any<number>()), Times.Once);
   });
+
+  it('should use Any to make a setup that will accept any value passed for a complex object param', () => {
+    mockITestInterface.Setup(i => i.GetNumberFromSomeStuff(Any<{ one: 1, two: 2 }>(), Any<TestClass>(), 1), 2);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const actual = classInstance.GetNumberFromSomeStuff({} as any, {} as any, 1);
+
+    expect(actual).toEqual(2);
+    mockITestInterface.Verify(i => i.GetNumberFromSomeStuff(Any<{ one: 1, two: 2 }>(), Any<TestClass>(), 1), Times.Once);
+  });
 });
