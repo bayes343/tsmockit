@@ -24,6 +24,7 @@ interface ITestInterface {
   GetStringFromInt(int: number): string;
   GetNumberFromSomeStuff(json: { one: 1, two: 2 }, testClass: TestClass, num: number): number;
   GetAString(): string;
+  GetSumFromNumbers(num1: number, num2: number): number;
 }
 
 class DiTest {
@@ -43,6 +44,10 @@ class DiTest {
 
   GetAString(): string {
     return this.dependency.GetAString();
+  }
+
+  GetSumFromNumbers(num1: number, num2: number): number {
+    return this.dependency.GetSumFromNumbers(num1, num2);
   }
 }
 
@@ -237,5 +242,19 @@ describe('Mock<T>', () => {
 
     expect(actual).toEqual('one');
     mockITestInterface.Verify(i => i.GetStringFromInt(Any<number>()), Times.Once);
+  });
+
+  it('should use Any to make a setup that will accept any value passed for the given parameter regardless of position', () => {
+    mockITestInterface.Setup(i => i.GetSumFromNumbers(Any<number>(), 1), 1);
+    mockITestInterface.Setup(i => i.GetSumFromNumbers(2, Any<number>()), 2);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const firstActual = classInstance.GetSumFromNumbers(1, 1);
+    const secondActual = classInstance.GetSumFromNumbers(2, 1);
+
+    expect(firstActual).toEqual(1);
+    expect(secondActual).toEqual(2);
+    mockITestInterface.Verify(i => i.GetSumFromNumbers(Any<number>(), 1), Times.Once);
+    mockITestInterface.Verify(i => i.GetSumFromNumbers(2, Any<number>()), Times.Once);
   });
 });
