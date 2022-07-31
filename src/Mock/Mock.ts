@@ -92,7 +92,7 @@ export class Mock<T> {
     }) : undefined;
   }
 
-  private getFunctionMapsFromSignature(memberSignatureMap: SignatureMap, args: any, exactSignatureMatch: boolean) {
+  private getFunctionMapsFromSignature(memberSignatureMap: SignatureMap, args: string[], exactSignatureMatch: boolean) {
     const existingMemberSignatureMap = this.memberSignatureMaps.find(
       s => s.signature === memberSignatureMap.signature);
     const functionMaps = existingMemberSignatureMap?.functionMaps;
@@ -102,8 +102,15 @@ export class Mock<T> {
     const functionMapsUsingAny = functionMaps?.filter(m => m.state.includes(ANY_VALUE));
     if (functionMapsUsingAny?.length) {
       functionMapsUsingAny.forEach(element => {
-        const anyTransposedState = (args as string[]).map(a => (element.state as unknown as string[])[args.indexOf(a)]);
-        exactFunctionMap = functionMaps?.find(m => JSON.stringify(m.state) === JSON.stringify(anyTransposedState));
+        if (!exactFunctionMap) {
+          const state = element.state as unknown as string[];
+          let anyTransposedState: string[] = [];
+          args.forEach((a, i) => {
+            anyTransposedState[i] = state[i] === ANY_VALUE ? ANY_VALUE : a;
+          });
+          exactFunctionMap = functionMaps?.find(m => JSON.stringify(m.state) === JSON.stringify(anyTransposedState));
+          console.log(args, state, anyTransposedState, exactFunctionMap);
+        }
       });
     }
 
