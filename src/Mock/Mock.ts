@@ -108,7 +108,7 @@ export class Mock<T> {
     const existingFunctionMap = existingSignatureMap.functionMaps.find(
       fm => JSON.stringify(fm.state) === JSON.stringify(newFunctionMap.state));
 
-    if (existingFunctionMap) {
+    if (existingFunctionMap && !newFunctionMap.singleUse) {
       const functionMaps = existingSignatureMap.functionMaps;
       functionMaps.splice(functionMaps.indexOf(existingFunctionMap), 1, newFunctionMap);
     } else {
