@@ -11,8 +11,8 @@ export class Mock<T> {
     return this.object;
   }
 
-  private setup(member: (func: T) => any, returns: any = null, exactSignatureMatch = true): void {
-    const memberSignatureMap = SignatureService.GetMemberSignatureMap(member, returns, exactSignatureMatch);
+  private setup(member: (func: T) => any, returns: any = null, exactSignatureMatch = true, singleUse = false): void {
+    const memberSignatureMap = SignatureService.GetMemberSignatureMap(member, returns, exactSignatureMatch, singleUse);
     this.updateMemberSignatureMaps(memberSignatureMap);
 
     const memberName = SignatureService.GetMemberNameFromSignature(memberSignatureMap.signature);
@@ -65,14 +65,19 @@ export class Mock<T> {
   ): Function | undefined {
     const existingMemberSignatureMap = this.memberSignatureMaps.find(
       s => s.signature === memberSignatureMap.signature);
-    const exactFunctionMap = existingMemberSignatureMap?.functionMaps.find(
+    const functionMaps = existingMemberSignatureMap?.functionMaps;
+    const exactFunctionMap = functionMaps?.find(
       m => JSON.stringify(m.state) === JSON.stringify(args));
-    const defaultFunctionMap = exactSignatureMatch ? undefined : existingMemberSignatureMap?.functionMaps.find(m => m.default);
+    const defaultFunctionMap = exactSignatureMatch ? undefined : functionMaps?.find(m => m.default);
 
     const functionMap = exactFunctionMap || defaultFunctionMap;
 
     return functionMap ? (() => {
       functionMap.timesCalled++;
+      if (functionMaps && functionMap.singleUse) {
+        const indexToDelete = functionMaps.indexOf(functionMap);
+        functionMaps.splice(indexToDelete, 1);
+      }
       return functionMap.returns;
     }) : undefined;
   }
