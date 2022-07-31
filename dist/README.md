@@ -143,11 +143,3 @@ mockIOdometer.Verify(o => o.GetMileage(), 1);
 mockIStereo.Setup(s => s.SetStation(1), 'Station set to 1');
 mockIStereo.Setup(s => s.SetStation(2), 'Station set to 2');
 ```
-
-## Conventions
-
-***This convention will be replaced by passing `false` to the `exactSignatureMatch` param when calling `Setup` in version 2.0.0.***
-
-You'll often want a mock to return the same response regardless of input parameters.  The following convention accommodates this:
-
-- If a method is called and no exact setup is available, the first `Setup` called without overriding `exactSignatureMatch` to `true` will be used.

@@ -10,7 +10,7 @@ export class Mock<T> {
     return this.object;
   }
 
-  public Setup(member: (func: T) => any, returns: any = null, exactSignatureMatch = false): void {
+  private setup(member: (func: T) => any, returns: any = null, exactSignatureMatch = true): void {
     const memberSignatureMap = SignatureService.GetMemberSignatureMap(member, returns, exactSignatureMatch);
     this.updateMemberSignatureMaps(memberSignatureMap);
 
@@ -22,6 +22,14 @@ export class Mock<T> {
         return this.getReturnsForFunction(memberSignatureMap, args, exactSignatureMatch)?.();
       });
     }
+  }
+
+  public Setup(member: (func: T) => any, returns: any = null): void {
+    this.setup(member, returns);
+  }
+
+  public SetupDefault(member: (func: T) => any, returns: any = null): void {
+    this.setup(member, returns, false);
   }
 
   public TimesMemberCalled(member: (func: T) => any): number {

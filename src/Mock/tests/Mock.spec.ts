@@ -159,19 +159,9 @@ describe('Mock<T>', () => {
     expect(callCount).toEqual(0);
   });
 
-  it('should default to the first setup when exact match is not found', () => {
+  it('should NOT default to the first setup when exact match is not found', () => {
     mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one');
     mockITestInterface.Setup(i => i.GetStringFromInt(3), 'three');
-    const classInstance = new DiTest(mockITestInterface.Object);
-
-    classInstance.GetStringFromInt(2);
-
-    mockITestInterface.Verify(i => i.GetStringFromInt(2), Times.Once);
-  });
-
-  it('should NOT default to the first setup when true was passed to setup exactSignatureMatch param for all setups', () => {
-    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one', true);
-    mockITestInterface.Setup(i => i.GetStringFromInt(3), 'three', true);
     const classInstance = new DiTest(mockITestInterface.Object);
 
     classInstance.GetStringFromInt(2);
@@ -179,9 +169,9 @@ describe('Mock<T>', () => {
     mockITestInterface.Verify(i => i.GetStringFromInt(2), Times.Never);
   });
 
-  it('should default to the first setup where true was not passed to the exactSignatureMatch param', () => {
-    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one', true);
-    mockITestInterface.Setup(i => i.GetStringFromInt(3), 'three');
+  it('should use default setup when no exact match is found', () => {
+    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one');
+    mockITestInterface.SetupDefault(i => i.GetStringFromInt(3), 'three');
     const classInstance = new DiTest(mockITestInterface.Object);
 
     const actual = classInstance.GetStringFromInt(2);

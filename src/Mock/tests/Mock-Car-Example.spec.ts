@@ -62,7 +62,7 @@ describe('Mock<T> Car Example', () => {
     mockIEngine.Setup(e => e.Start());
     mockIEngine.Setup(e => e.Stop());
     mockIOdometer.Setup(o => o.GetMileage(), 100);
-    mockIStereo.Setup(s => s.SetStation(0), 'Station set');
+    mockIStereo.SetupDefault(s => s.SetStation(0), 'Station set');
     car = new Car(mockIEngine.Object, mockIOdometer.Object, mockIStereo.Object);
   });
 
@@ -86,5 +86,4 @@ describe('Mock<T> Car Example', () => {
     mockIStereo.Verify(s => s.SetStation(0), 2);
     mockIStereo.Verify(s => s.SetStation(3), 1);
   });
-
 });
