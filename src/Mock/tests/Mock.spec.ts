@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import { Any } from '../Any';
 import { Mock } from '../Mock';
 import { Times } from '../Times';
 
@@ -226,5 +227,15 @@ describe('Mock<T>', () => {
 
     mockITestInterface.Verify(i => i.GetStringFromInt(1), Times.Once);
     mockITestInterface.Verify(i => i.GetStringFromInt(2), Times.Once);
+  });
+
+  it('should use Any to make a setup that will accept any value passed for the given parameter', () => {
+    mockITestInterface.Setup(i => i.GetStringFromInt(Any<number>()), 'one');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const actual = classInstance.GetStringFromInt(1);
+
+    expect(actual).toEqual('one');
+    mockITestInterface.Verify(i => i.GetStringFromInt(Any<number>()), Times.Once);
   });
 });
