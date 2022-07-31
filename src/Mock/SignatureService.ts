@@ -21,7 +21,7 @@ export class SignatureService {
       functionMaps: [{
         default: !exactSignatureMatch,
         state: state,
-        returns: returns ? returns : null,
+        returns: returns,
         timesCalled: 0,
         singleUse: singleUse
       }]

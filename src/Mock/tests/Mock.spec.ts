@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Mock } from '../Mock';
 import { Times } from '../Times';
 
@@ -203,5 +204,15 @@ describe('Mock<T>', () => {
 
     expect(first).toEqual('one');
     expect(second).toEqual('two');
+  });
+
+  it('should verify a setup that returns an empty string', () => {
+    mockITestInterface.Setup(i => i.GetAString(), '');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const result = classInstance.GetAString();
+
+    expect(result).toEqual('');
+    mockITestInterface.Verify(i => i.GetAString(), Times.Once);
   });
 });
