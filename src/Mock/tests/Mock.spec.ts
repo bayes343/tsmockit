@@ -179,4 +179,15 @@ describe('Mock<T>', () => {
     expect(actual).toEqual('three');
     mockITestInterface.Verify(i => i.GetStringFromInt(2), Times.Once);
   });
+
+  it('should define a setup only to be used only once', () => {
+    mockITestInterface.SetupOnce(i => i.GetAString(), 'one');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const first = classInstance.GetAString();
+    const second = classInstance.GetAString?.();
+
+    expect(first).toEqual('one');
+    expect(second).toBeUndefined();
+  });
 });
