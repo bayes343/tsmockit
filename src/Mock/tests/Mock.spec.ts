@@ -215,4 +215,16 @@ describe('Mock<T>', () => {
     expect(result).toEqual('');
     mockITestInterface.Verify(i => i.GetAString(), Times.Once);
   });
+
+  it('should distinguish between multiple setups that return the same value', () => {
+    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one');
+    mockITestInterface.Setup(i => i.GetStringFromInt(2), 'one');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    classInstance.GetStringFromInt(1);
+    classInstance.GetStringFromInt(2);
+
+    mockITestInterface.Verify(i => i.GetStringFromInt(1), Times.Once);
+    mockITestInterface.Verify(i => i.GetStringFromInt(2), Times.Once);
+  });
 });

@@ -3,8 +3,9 @@ import { SignatureMap } from './SignatureMap';
 
 export class SignatureService {
   public static GetMemberSignatureMap(
-    value: (obj: any) => any, returns?: any,
-    exactSignatureMatch = false,
+    value: (obj: any) => any,
+    returns?: any,
+    exactSignatureMatch = true,
     singleUse = false
   ): SignatureMap {
     let memberSignature = '';
@@ -23,7 +24,8 @@ export class SignatureService {
         state: state,
         returns: returns,
         timesCalled: 0,
-        singleUse: singleUse
+        singleUse: singleUse,
+        originalSignature: this.getOriginalSignature(value)
       }]
     };
   }
@@ -36,6 +38,13 @@ export class SignatureService {
     return SignatureService.MemberSignatureIsProperty(memberSignatureString) ?
       memberSignatureString : memberSignatureString.split('(')[0];
   }
+
+  private static getOriginalSignature(value: (obj: any) => any): string | undefined {
+    let originalSignature = value.toString();
+    originalSignature = originalSignature?.indexOf('i.') ? originalSignature.split('i.')[1] : originalSignature;
+    originalSignature = originalSignature?.indexOf(';') ? originalSignature.split(';')[0] : originalSignature;
+    return originalSignature?.trim();
+  };
 
   private static getPropertyMemberSignature(value: (obj: any) => any, memberSignature: string) {
     const propertyMemberMatches = SignatureService.getMatchesForRegex(value, Regex.Property);

@@ -44,17 +44,23 @@ export class Mock<T> {
   }
 
   public TimesMemberCalled(member: (func: T) => any): number {
-    const memberSignature = SignatureService.GetMemberSignatureMap(member);
-    const functionMap: FunctionMap | undefined = this.getFunctionMapFromSignatureMap(memberSignature);
-    const timesCalled = functionMap ? functionMap.timesCalled : 0;
+    const memberSignatureMap = SignatureService.GetMemberSignatureMap(member);
+    const functionMap: FunctionMap | undefined = this.getFunctionMapFromSignatureMap(memberSignatureMap);
 
-    return timesCalled;
+    return functionMap ? functionMap.timesCalled : 0;
   }
 
   public Verify(member: (func: T) => any, times: Times | number): void {
     const timesCalled = this.TimesMemberCalled(member);
+    const signature = SignatureService.GetMemberSignatureMap(member).signature;
+    const memberSignatureMap = this.memberSignatureMaps.find(m => m.signature === signature);
 
-    expect(timesCalled).toEqual(times);
+    if (timesCalled !== times) {
+      console.log(`Actual calls made for, "${signature}:`,
+        memberSignatureMap?.functionMaps.map(m => `${m.originalSignature} x ${m.timesCalled}`))
+    }
+
+    expect(timesCalled).toEqual(times, timesCalled !== times ? `` : undefined);
   }
 
   private getReturnsValueForProperty(memberSignatureMap: SignatureMap): any {
@@ -117,11 +123,11 @@ export class Mock<T> {
   }
 
   private getFunctionMapFromSignatureMap(memberSignature: SignatureMap): FunctionMap | undefined {
-    const existingMember = this.memberSignatureMaps.find(m => m.signature === memberSignature.signature);
+    const existingMemberSignatureMap = this.memberSignatureMaps.find(m => m.signature === memberSignature.signature);
     const functionMapToFind = memberSignature.functionMaps[0];
 
-    return existingMember?.functionMaps.find(
+    return existingMemberSignatureMap?.functionMaps.find(
       m => JSON.stringify(m.state) === JSON.stringify(functionMapToFind.state)) ||
-      existingMember?.functionMaps.find(m => m.default);
+      existingMemberSignatureMap?.functionMaps.find(m => m.default);
   }
 }

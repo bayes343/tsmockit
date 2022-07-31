@@ -3,5 +3,6 @@ export type FunctionMap = {
   state: string,
   returns: Function,
   timesCalled: number,
-  singleUse: boolean
+  singleUse: boolean,
+  originalSignature: string | undefined
 };
