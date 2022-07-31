@@ -19,7 +19,8 @@ class Mock<T>
 ```typescript
 Setup(
   member: (func: T) => any,
-  returns: any = null
+  returns: any = null,
+  exactSignatureMatch = false // will default to true and replace the signature matching convention as of v2.0.0.
 ): void
 ```
 ```typescript
@@ -144,6 +145,9 @@ mockIStereo.Setup(s => s.SetStation(2), 'Station set to 2');
 ```
 
 ## Conventions
-You'll often want a mock to return the same response regardless of input parameters.  This library accommodates this through these conventions:
-- If only one 'Setup' is made for a given method, the return value will be used for any combination of parameters (i.e. parameter values other than those specified in the setup).
-- If a method is called and no exact setup is available, the first 'Setup' will be returned.  In other words, if you have multiple setups for a method and this method is called using parameters that none of those setups accounted for, the return value will be the one specified in the first setup.
+
+***This convention will be replaced by passing `false` to the `exactSignatureMatch` param when calling `Setup` in version 2.0.0.***
+
+You'll often want a mock to return the same response regardless of input parameters.  The following convention accommodates this:
+
+- If a method is called and no exact setup is available, the first `Setup` called without overriding `exactSignatureMatch` to `true` will be used.

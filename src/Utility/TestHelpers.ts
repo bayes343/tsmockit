@@ -1,3 +1,10 @@
+import { EmitEventAtElement } from './EmitEventAtElement';
+import { EmitKeyEventAtElement } from './EmitKeyEventAtElement';
+import { Expect } from './Expect';
+
+/**
+ * @deprecated This class will be removed in v2 - Import its functions directly as of 1.3.0
+ */
 export class TestHelpers {
   /**
    * Emit an event at a given element
@@ -5,9 +12,7 @@ export class TestHelpers {
    * @param eventType
    */
   public static EmitEventAtElement(element: HTMLElement, eventType: string): void {
-    const event = document.createEvent('Event');
-    event.initEvent(eventType);
-    element.dispatchEvent(event);
+    EmitEventAtElement(element, eventType);
   }
 
   /**
@@ -21,13 +26,7 @@ export class TestHelpers {
     key: string,
     keyEvent: 'keydown' | 'keypress' | 'keyup' | 'input'
   ): void {
-    const event = document.createEvent('Event') as any;
-
-    event['keyCode'] = key;
-    event['key'] = key;
-
-    event.initEvent(keyEvent);
-    element.dispatchEvent(event);
+    EmitKeyEventAtElement(element, key, keyEvent);
   }
 
   /**
@@ -68,19 +67,6 @@ export class TestHelpers {
     interval = 0,
     getTimeFunc = () => Date.now()
   ): Promise<void> {
-    return new Promise(resolve => {
-      const startTime = getTimeFunc();
-      const timedOut = () => getTimeFunc() - startTime > 1000;
-      const execute = () => {
-        const selection = selector();
-        if (selection || timedOut()) {
-          assertion(expect(selection));
-          resolve();
-        } else {
-          setTimeout(() => execute(), interval);
-        }
-      };
-      execute();
-    });
+    return Expect(selector, assertion, interval, getTimeFunc);
   }
 }

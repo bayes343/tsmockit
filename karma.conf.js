@@ -28,9 +28,9 @@ module.exports = function (config) {
       ]
     },
     karmaTypescriptConfig: {
-      tsconfig: "./tsconfig.json"
+      tsconfig: './tsconfig.json'
     }
-  })
-}
+  });
+};
 
-process.env.CHROME_BIN = require('puppeteer').executablePath()
+process.env.CHROME_BIN = require('puppeteer').executablePath();

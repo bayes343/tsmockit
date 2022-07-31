@@ -3,7 +3,7 @@ import { Regex } from './Constants';
 
 export class SignatureService {
 
-  public static GetMemberSignatureMap(value: (obj: any) => any, returns?: any): SignatureMap {
+  public static GetMemberSignatureMap(value: (obj: any) => any, returns?: any, exactSignatureMatch = false): SignatureMap {
     let memberSignature = '';
 
     memberSignature =
@@ -15,7 +15,7 @@ export class SignatureService {
 
     return {
       signature: memberSignature,
-      functionMaps: [{ state: state, returns: returns ? returns : null, timesCalled: 0 }]
+      functionMaps: [{ default: !exactSignatureMatch, state: state, returns: returns ? returns : null, timesCalled: 0 }]
     };
   }
 
