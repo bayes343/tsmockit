@@ -33,6 +33,16 @@ export class Mock<T> {
     this.setup(member, returns, false);
   }
 
+  public SetupOnce(member: (func: T) => any, returns: any = null): void {
+    this.setup(member, returns, true, true);
+  }
+
+  public SetupSequence(setups: [(func: T) => any, any]): void {
+    setups.forEach(setup => {
+      this.setup(setup[0], setup[1], true, true);
+    });
+  }
+
   public TimesMemberCalled(member: (func: T) => any): number {
     const memberSignature = SignatureService.GetMemberSignatureMap(member);
     const functionMap: FunctionMap | undefined = this.getFunctionMapFromSignatureMap(memberSignature);
