@@ -7,24 +7,46 @@ import { ANY_VALUE } from './Any';
 export class Mock<T> {
   private memberSignatureMaps = new Array<SignatureMap>();
   private object: T = {} as T;
+  /**
+   * The mock object of the given type "T" to inject as a substitute to a concrete implementation
+   */
   public get Object(): T {
     return this.object;
   }
 
+  /**
+   * Configure what the mock object will return when a given member is accessed
+   * @param member
+   * @param returns
+   */
   public Setup(member: (func: T) => any, returns: any = null): void {
     this.setup(member, returns);
   }
 
+  /**
+   * Configure a setup that will only resolve on the first time the member is registered
+   * @param member
+   * @param returns
+   */
   public SetupOnce(member: (func: T) => any, returns: any = null): void {
     this.setup(member, returns, true);
   }
 
+  /**
+   * Configure a set of setups that will only resolve on the first time the member is registered
+   * @param setups
+   */
   public SetupSequence(setups: [(func: T) => any, any][]): void {
     setups.forEach(setup => {
       this.SetupOnce(setup[0], setup[1]);
     });
   }
 
+  /**
+   * Return the number of times a given member was referenced
+   * @param member
+   * @returns
+   */
   public TimesMemberCalled(member: (func: T) => any): number {
     const memberSignatureMap = SignatureService.GetMemberSignatureMap(member);
     const functionMap: FunctionMap | undefined = this.getFunctionMapsFromSignature(
@@ -33,6 +55,11 @@ export class Mock<T> {
     return functionMap?.timesCalled || 0;
   }
 
+  /**
+   * Make an assertion that a given member was referenced a given number of times
+   * @param member
+   * @param times
+   */
   public Verify(member: (func: T) => any, times: Times | number): void {
     const timesCalled = this.TimesMemberCalled(member);
     const signature = SignatureService.GetMemberSignatureMap(member).signature;
