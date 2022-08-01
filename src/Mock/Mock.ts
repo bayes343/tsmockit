@@ -39,11 +39,12 @@ export class Mock<T> {
     const memberSignatureMap = this.memberSignatureMaps.find(m => m.signature === signature);
 
     if (timesCalled !== times) {
+      // eslint-disable-next-line no-console
       console.log(`Actual calls made for, "${signature}:`,
-        memberSignatureMap?.functionMaps.map(m => `${m.originalSignature} x ${m.timesCalled}`))
+        memberSignatureMap?.functionMaps.map(m => `${m.originalSignature} x ${m.timesCalled}`));
     }
 
-    expect(timesCalled).toEqual(times, timesCalled !== times ? `` : undefined);
+    expect(timesCalled).toEqual(times, timesCalled !== times ? '' : undefined);
   }
 
   private setup(member: (func: T) => any, returns: any = null, singleUse = false): void {
@@ -91,7 +92,7 @@ export class Mock<T> {
     if (!functionMapForArgs && functionMapsUsingAny?.length) {
       functionMapsUsingAny.forEach(element => {
         if (!functionMapForArgs) {
-          let anyTransposedState = new Array<string>();
+          const anyTransposedState = new Array<string>();
           args.forEach((a, i) => anyTransposedState[i] = element.state[i] === ANY_VALUE ? ANY_VALUE : a);
           functionMapForArgs = signatureFunctionMaps?.find(m => JSON.stringify(m.state) === JSON.stringify(anyTransposedState));
         }
@@ -113,7 +114,8 @@ export class Mock<T> {
   }
 
   private updateSignatureMapFunctions(existingSignatureMap: SignatureMap, newFunctionMap: FunctionMap) {
-    const existingFunctionMap = existingSignatureMap.functionMaps.find(fm => JSON.stringify(fm.state) === JSON.stringify(newFunctionMap.state));
+    const existingFunctionMap = existingSignatureMap.functionMaps.find(
+      fm => JSON.stringify(fm.state) === JSON.stringify(newFunctionMap.state));
 
     if (existingFunctionMap && !newFunctionMap.singleUse) {
       const functionMaps = existingSignatureMap.functionMaps;
