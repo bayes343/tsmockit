@@ -1,4 +1,4 @@
-import { Mock } from '../Mock';
+import { Any, Mock, Times } from '../../public_api';
 
 interface IEngine {
   Start(): void;
@@ -52,39 +52,46 @@ class Car {
   }
 }
 
-describe('Mock<T> Car Example', () => {
+describe('Car', () => {
   let car: Car;
   const mockIEngine = new Mock<IEngine>();
   const mockIOdometer = new Mock<IOdometer>();
   const mockIStereo = new Mock<IStereo>();
 
   beforeEach(() => {
-    mockIEngine.Setup(e => e.Start());
-    mockIEngine.Setup(e => e.Stop());
-    mockIOdometer.Setup(o => o.GetMileage(), 100);
-    mockIStereo.Setup(s => s.SetStation(0), 'Station set');
     car = new Car(mockIEngine.Object, mockIOdometer.Object, mockIStereo.Object);
   });
 
-  it('should mock the car class\'s dependencies allowing car to be unit tested', () => {
+  it('should call Engine.Start when StartEngine is called', () => {
+    mockIEngine.Setup(e => e.Start());
     car.StartEngine();
-    expect(car.PoweredOn).toBeTruthy();
+    mockIEngine.Verify(e => e.Start(), Times.Once);
+  });
 
+  it('should call Engine.Stop when StopEngine is called', () => {
+    mockIEngine.Setup(e => e.Stop());
     car.StopEngine();
-    expect(car.PoweredOn).toBeFalsy();
+    mockIEngine.Verify(e => e.Stop(), Times.Once);
+  });
 
-    expect(car.Mileage).toEqual(100);
+  it('should return the result of Odometer.GetMileage on referencing the Mileage property', () => {
+    mockIOdometer.Setup(o => o.GetMileage(), 100);
+
+    const mileage = car.Mileage;
+
+    expect(mileage).toEqual(100);
+    mockIOdometer.Verify(o => o.GetMileage(), Times.Once);
+  });
+
+  it('should call Stereo.SetStation on calling ChangeRadioStation returning the string from Stereo', () => {
+    mockIStereo.Setup(s => s.SetStation(Any<number>()), 'Station set'); // default fallback setup when a more specific setup isn't available
+    mockIStereo.Setup(s => s.SetStation(3), 'Station 3');
+
+    expect(car.ChangeRadioStation(3)).toEqual('Station 3');
     expect(car.ChangeRadioStation(0)).toEqual('Station set');
     expect(car.ChangeRadioStation(2)).toEqual('Station set');
 
-    mockIStereo.Setup(s => s.SetStation(3), 'Station 3');
-    expect(car.ChangeRadioStation(3)).toEqual('Station 3');
-
-    mockIEngine.Verify(e => e.Start(), 1);
-    mockIEngine.Verify(e => e.Stop(), 1);
-    mockIOdometer.Verify(o => o.GetMileage(), 1);
-    mockIStereo.Verify(s => s.SetStation(0), 2);
-    mockIStereo.Verify(s => s.SetStation(3), 1);
+    mockIStereo.Verify(s => s.SetStation(3), Times.Once);
+    mockIStereo.Verify(s => s.SetStation(Any<number>()), 2);
   });
-
 });

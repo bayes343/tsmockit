@@ -1,5 +1,5 @@
 # tsmockit
-The public facing readme is located in the `dist` directory.  This readme is intended for maintainers / contributors to tsmockit.
+This readme is intended for maintainers / contributors to tsmockit.  The public facing readme is located [dist/README.md](dist/README.md).
 
 ## Local Development
 ### Installation

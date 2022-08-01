@@ -1,9 +1,13 @@
-import { SignatureMap } from './TypeLiterals';
+import { ANY_VALUE } from './Any';
 import { Regex } from './Constants';
+import { SignatureMap } from './SignatureMap';
 
 export class SignatureService {
-
-  public static GetMemberSignatureMap(value: (obj: any) => any, returns?: any, exactSignatureMatch = false): SignatureMap {
+  public static GetMemberSignatureMap(
+    value: (obj: any) => any,
+    returns?: any,
+    singleUse = false
+  ): SignatureMap {
     let memberSignature = '';
 
     memberSignature =
@@ -15,7 +19,13 @@ export class SignatureService {
 
     return {
       signature: memberSignature,
-      functionMaps: [{ default: !exactSignatureMatch, state: state, returns: returns ? returns : null, timesCalled: 0 }]
+      functionMaps: [{
+        state: state,
+        returns: returns,
+        timesCalled: 0,
+        singleUse: singleUse,
+        originalSignature: this.getOriginalSignature(value)
+      }]
     };
   }
 
@@ -27,6 +37,13 @@ export class SignatureService {
     return SignatureService.MemberSignatureIsProperty(memberSignatureString) ?
       memberSignatureString : memberSignatureString.split('(')[0];
   }
+
+  private static getOriginalSignature(value: (obj: any) => any): string | undefined {
+    let originalSignature = value.toString();
+    originalSignature = originalSignature?.indexOf('i.') ? originalSignature.split('i.')[1] : originalSignature;
+    originalSignature = originalSignature?.indexOf(';') ? originalSignature.split(';')[0] : originalSignature;
+    return originalSignature?.trim();
+  };
 
   private static getPropertyMemberSignature(value: (obj: any) => any, memberSignature: string) {
     const propertyMemberMatches = SignatureService.getMatchesForRegex(value, Regex.Property);
@@ -74,13 +91,14 @@ export class SignatureService {
   }
 
   private static getParamString(operationNameMatches: RegExpMatchArray) {
-    const paramStrings = operationNameMatches[2].match(Regex.Params);
-    let params = '';
+    const paramStrings = operationNameMatches[2]
+      .replace(Regex.AnyValue, ANY_VALUE)
+      .match(Regex.Params);
 
+    let params = '';
     for (let index = 0; index < (paramStrings ? paramStrings.length : 0); index++) {
       params += (`${index > 0 ? ', ' : ''}p${index}`);
     }
-
     return params;
   }
 }

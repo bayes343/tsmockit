@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+import { Any } from '../Any';
 import { Mock } from '../Mock';
 import { Times } from '../Times';
 
@@ -22,6 +24,7 @@ interface ITestInterface {
   GetStringFromInt(int: number): string;
   GetNumberFromSomeStuff(json: { one: 1, two: 2 }, testClass: TestClass, num: number): number;
   GetAString(): string;
+  GetSumFromNumbers(num1: number, num2: number): number;
 }
 
 class DiTest {
@@ -41,6 +44,10 @@ class DiTest {
 
   GetAString(): string {
     return this.dependency.GetAString();
+  }
+
+  GetSumFromNumbers(num1: number, num2: number): number {
+    return this.dependency.GetSumFromNumbers(num1, num2);
   }
 }
 
@@ -159,19 +166,9 @@ describe('Mock<T>', () => {
     expect(callCount).toEqual(0);
   });
 
-  it('should default to the first setup when exact match is not found', () => {
+  it('should NOT default to the first setup when exact match is not found', () => {
     mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one');
     mockITestInterface.Setup(i => i.GetStringFromInt(3), 'three');
-    const classInstance = new DiTest(mockITestInterface.Object);
-
-    classInstance.GetStringFromInt(2);
-
-    mockITestInterface.Verify(i => i.GetStringFromInt(2), Times.Once);
-  });
-
-  it('should NOT default to the first setup when true was passed to setup exactSignatureMatch param for all setups', () => {
-    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one', true);
-    mockITestInterface.Setup(i => i.GetStringFromInt(3), 'three', true);
     const classInstance = new DiTest(mockITestInterface.Object);
 
     classInstance.GetStringFromInt(2);
@@ -179,14 +176,91 @@ describe('Mock<T>', () => {
     mockITestInterface.Verify(i => i.GetStringFromInt(2), Times.Never);
   });
 
-  it('should default to the first setup where true was not passed to the exactSignatureMatch param', () => {
-    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one', true);
-    mockITestInterface.Setup(i => i.GetStringFromInt(3), 'three');
+  it('should use Any to setup a default setup when no exact match is found', () => {
+    mockITestInterface.Setup(i => i.GetStringFromInt(Any<number>()), 'three');
+    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one');
     const classInstance = new DiTest(mockITestInterface.Object);
 
     const actual = classInstance.GetStringFromInt(2);
 
     expect(actual).toEqual('three');
+    mockITestInterface.Verify(i => i.GetStringFromInt(Any<number>()), Times.Once);
+  });
+
+  it('should define a setup only to be used only once', () => {
+    mockITestInterface.SetupOnce(i => i.GetAString(), 'one');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const first = classInstance.GetAString();
+    const second = classInstance.GetAString?.();
+
+    expect(first).toEqual('one');
+    expect(second).toBeUndefined();
+  });
+
+  it('should define a setup sequence, with each setup only working once', () => {
+    mockITestInterface.SetupSequence([
+      [i => i.GetAString(), 'one'],
+      [i => i.GetAString(), 'two']
+    ]);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const first = classInstance.GetAString();
+    const second = classInstance.GetAString();
+
+    expect(first).toEqual('one');
+    expect(second).toEqual('two');
+  });
+
+  it('should verify a setup that returns an empty string', () => {
+    mockITestInterface.Setup(i => i.GetAString(), '');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const result = classInstance.GetAString();
+
+    expect(result).toEqual('');
+    mockITestInterface.Verify(i => i.GetAString(), Times.Once);
+  });
+
+  it('should distinguish between multiple setups that return the same value', () => {
+    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one');
+    mockITestInterface.Setup(i => i.GetStringFromInt(2), 'one');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    classInstance.GetStringFromInt(1);
+    classInstance.GetStringFromInt(2);
+
+    mockITestInterface.Verify(i => i.GetStringFromInt(1), Times.Once);
     mockITestInterface.Verify(i => i.GetStringFromInt(2), Times.Once);
+  });
+
+  it('should use Any to make a setup that will accept any value passed for the given parameter', () => {
+    mockITestInterface.Setup(i => i.GetStringFromInt(Any<number>()), 'one');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const actual = classInstance.GetStringFromInt(100);
+
+    expect(actual).toEqual('one');
+    mockITestInterface.Verify(i => i.GetStringFromInt(Any<number>()), Times.Once);
+  });
+
+  it('should use Any to make a setup that will accept any value passed for the given parameter regardless of position', () => {
+    mockITestInterface.Setup(i => i.GetSumFromNumbers(2, Any<number>()), 2);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const actual = classInstance.GetSumFromNumbers(2, 1);
+
+    expect(actual).toEqual(2);
+    mockITestInterface.Verify(i => i.GetSumFromNumbers(2, Any<number>()), Times.Once);
+  });
+
+  it('should use Any to make a setup that will accept any value passed for a complex object param', () => {
+    mockITestInterface.Setup(i => i.GetNumberFromSomeStuff(Any<{ one: 1, two: 2 }>(), Any<TestClass>(), 1), 2);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const actual = classInstance.GetNumberFromSomeStuff({} as any, {} as any, 1);
+
+    expect(actual).toEqual(2);
+    mockITestInterface.Verify(i => i.GetNumberFromSomeStuff(Any<{ one: 1, two: 2 }>(), Any<TestClass>(), 1), Times.Once);
   });
 });
