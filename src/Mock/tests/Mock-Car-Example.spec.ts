@@ -1,6 +1,4 @@
-import { Any } from '../Any';
-import { Mock } from '../Mock';
-import { Times } from '../Times';
+import { Any, Mock, Times } from '../../public_api';
 
 interface IEngine {
   Start(): void;
