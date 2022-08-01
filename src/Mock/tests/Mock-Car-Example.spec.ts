@@ -93,7 +93,7 @@ describe('Car', () => {
     expect(car.ChangeRadioStation(0)).toEqual('Station set');
     expect(car.ChangeRadioStation(2)).toEqual('Station set');
 
-    mockIStereo.Verify(s => s.SetStation(3), 1);
+    mockIStereo.Verify(s => s.SetStation(3), Times.Once);
     mockIStereo.Verify(s => s.SetStation(Any<number>()), 2);
   });
 });
