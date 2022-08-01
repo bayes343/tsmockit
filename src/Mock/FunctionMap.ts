@@ -1,6 +1,5 @@
 export type FunctionMap = {
-  default: boolean,
-  state: string,
+  state: string | string[],
   returns: Function,
   timesCalled: number,
   singleUse: boolean,

@@ -5,7 +5,6 @@ export class SignatureService {
   public static GetMemberSignatureMap(
     value: (obj: any) => any,
     returns?: any,
-    exactSignatureMatch = true,
     singleUse = false
   ): SignatureMap {
     let memberSignature = '';
@@ -20,7 +19,6 @@ export class SignatureService {
     return {
       signature: memberSignature,
       functionMaps: [{
-        default: !exactSignatureMatch,
         state: state,
         returns: returns,
         timesCalled: 0,

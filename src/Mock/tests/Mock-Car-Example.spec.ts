@@ -1,3 +1,4 @@
+import { Any } from '../Any';
 import { Mock } from '../Mock';
 
 interface IEngine {
@@ -62,7 +63,7 @@ describe('Mock<T> Car Example', () => {
     mockIEngine.Setup(e => e.Start());
     mockIEngine.Setup(e => e.Stop());
     mockIOdometer.Setup(o => o.GetMileage(), 100);
-    mockIStereo.SetupDefault(s => s.SetStation(0), 'Station set');
+    mockIStereo.Setup(s => s.SetStation(Any<number>()), 'Station set');
     car = new Car(mockIEngine.Object, mockIOdometer.Object, mockIStereo.Object);
   });
 
@@ -83,7 +84,7 @@ describe('Mock<T> Car Example', () => {
     mockIEngine.Verify(e => e.Start(), 1);
     mockIEngine.Verify(e => e.Stop(), 1);
     mockIOdometer.Verify(o => o.GetMileage(), 1);
-    mockIStereo.Verify(s => s.SetStation(0), 2);
+    mockIStereo.Verify(s => s.SetStation(Any<number>()), 2);
     mockIStereo.Verify(s => s.SetStation(3), 1);
   });
 });
