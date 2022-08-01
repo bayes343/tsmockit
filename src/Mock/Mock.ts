@@ -96,10 +96,11 @@ export class Mock<T> {
     const existingMemberSignatureMap = this.memberSignatureMaps.find(
       s => s.signature === memberSignatureMap.signature);
     const functionMaps = existingMemberSignatureMap?.functionMaps;
+
     let exactFunctionMap = functionMaps?.find(m => JSON.stringify(m.state) === JSON.stringify(args));
     const defaultFunctionMap = exactSignatureMatch ? undefined : functionMaps?.find(m => m.default);
-
     const functionMapsUsingAny = functionMaps?.filter(m => m.state.includes(ANY_VALUE));
+
     if (functionMapsUsingAny?.length) {
       functionMapsUsingAny.forEach(element => {
         if (!exactFunctionMap) {
