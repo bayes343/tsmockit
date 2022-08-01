@@ -1,3 +1,4 @@
+import { ANY_VALUE } from './Any';
 import { Regex } from './Constants';
 import { SignatureMap } from './SignatureMap';
 
@@ -90,13 +91,14 @@ export class SignatureService {
   }
 
   private static getParamString(operationNameMatches: RegExpMatchArray) {
-    const paramStrings = operationNameMatches[2].match(Regex.Params);
-    let params = '';
+    const paramStrings = operationNameMatches[2]
+      .replace(Regex.AnyValue, ANY_VALUE)
+      .match(Regex.Params);
 
+    let params = '';
     for (let index = 0; index < (paramStrings ? paramStrings.length : 0); index++) {
       params += (`${index > 0 ? ', ' : ''}p${index}`);
     }
-
     return params;
   }
 }

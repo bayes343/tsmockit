@@ -177,8 +177,8 @@ describe('Mock<T>', () => {
   });
 
   it('should use Any to setup a default setup when no exact match is found', () => {
-    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one');
     mockITestInterface.Setup(i => i.GetStringFromInt(Any<number>()), 'three');
+    mockITestInterface.Setup(i => i.GetStringFromInt(1), 'one');
     const classInstance = new DiTest(mockITestInterface.Object);
 
     const actual = classInstance.GetStringFromInt(2);
@@ -238,7 +238,7 @@ describe('Mock<T>', () => {
     mockITestInterface.Setup(i => i.GetStringFromInt(Any<number>()), 'one');
     const classInstance = new DiTest(mockITestInterface.Object);
 
-    const actual = classInstance.GetStringFromInt(1);
+    const actual = classInstance.GetStringFromInt(100);
 
     expect(actual).toEqual('one');
     mockITestInterface.Verify(i => i.GetStringFromInt(Any<number>()), Times.Once);
