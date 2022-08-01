@@ -6,6 +6,7 @@ Generic mocking library for TypeScript
 
 Helpful links:
 - [GitHub](https://github.com/bayes343/tsmockit)
+- [npm](https://www.npmjs.com/package/tsmockit)
 - [Docs](https://bayes343.github.io/tsmockit/modules.html)
 
 This library exposes a generic class, `Mock<T>`, which allows you to mock dependencies and verify usage in an intuitive and type safe manner.  Its API is based on the C# "moq" library.
@@ -111,3 +112,17 @@ describe('Car', () => {
   });
 });
 ```
+
+## Version 2 notes
+
+- Any\<T\>
+  - A helper function which allows clients to create "Setups" on methods to be used disregarding all, or some, of the exact values the method is called with.
+    ```typescript
+    mockIStereo.Setup(s => s.SetStation(Any<number>()), 'Station set');
+    ```
+- SetupOnce
+  - Creates a setup the same as the regular `Setup` method except for once the setup is used, it will de-register itself.
+  - One use could be an inferred guarantee that a given method on a dependency is not being called more than you expect. Using `SetupOnce` for a setup that should only be used once, will have the inherent effect of leading to a runtime error at test time on the second execution.
+- SetupSequence
+  - Creates several, "one time" setups for a given method.
+  - You'll occasionally want the first execution of a given method on a dependency to return "x" but then "y" on the following execution.  Use `SetupSequence` to achieve this.
