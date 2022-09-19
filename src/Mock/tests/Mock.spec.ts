@@ -25,6 +25,7 @@ interface ITestInterface {
   GetNumberFromSomeStuff(json: { one: 1, two: 2 }, testClass: TestClass, num: number): number;
   GetAString(): string;
   GetSumFromNumbers(num1: number, num2: number): number;
+  GetSumFromOneOrTwoNumbers(num1: number, num2?: number): number;
 }
 
 class DiTest {
@@ -48,6 +49,10 @@ class DiTest {
 
   GetSumFromNumbers(num1: number, num2: number): number {
     return this.dependency.GetSumFromNumbers(num1, num2);
+  }
+
+  GetSumFromOneOrTwoNumbers(num1: number, num2?: number): number {
+    return this.dependency.GetSumFromOneOrTwoNumbers(num1, num2);
   }
 }
 
@@ -262,5 +267,22 @@ describe('Mock<T>', () => {
 
     expect(actual).toEqual(2);
     mockITestInterface.Verify(i => i.GetNumberFromSomeStuff(Any<{ one: 1, two: 2 }>(), Any<TestClass>(), 1), Times.Once);
+  });
+
+  it('should allow use for any for some params and literal values for others', () => {
+    mockITestInterface.Setup(i => i.GetSumFromNumbers(Any<number>(), 1), 100);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetSumFromNumbers(10, 1)).toEqual(100);
+    expect(classInstance.GetSumFromNumbers(5, 1)).toEqual(100);
+    expect(classInstance.GetSumFromNumbers(1, 1)).toEqual(100);
+  });
+
+  it('should not match any on undefined params', () => {
+    mockITestInterface.Setup(i => i.GetSumFromOneOrTwoNumbers(1, Any<number>()), 100);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetSumFromOneOrTwoNumbers(1, 1)).toEqual(100);
+    expect(classInstance.GetSumFromOneOrTwoNumbers(1, undefined)).not.toEqual(100);
   });
 });

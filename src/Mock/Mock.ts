@@ -120,7 +120,7 @@ export class Mock<T> {
       functionMapsUsingAny.forEach(element => {
         if (!functionMapForArgs) {
           const anyTransposedState = new Array<string>();
-          args.forEach((a, i) => anyTransposedState[i] = element.state[i] === ANY_VALUE ? ANY_VALUE : a);
+          args.forEach((a, i) => anyTransposedState[i] = (a !== undefined && element.state[i] === ANY_VALUE) ? ANY_VALUE : a);
           functionMapForArgs = signatureFunctionMaps?.find(m => JSON.stringify(m.state) === JSON.stringify(anyTransposedState));
         }
       });
