@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { EmitKeyEventAtElement } from '../EmitKeyEventAtElement';
 import { Expect } from '../Expect';
 

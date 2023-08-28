@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { EmitEventAtElement } from '../EmitEventAtElement';
 import { Expect } from '../Expect';
 
