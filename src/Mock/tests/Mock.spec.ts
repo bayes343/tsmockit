@@ -26,6 +26,7 @@ interface ITestInterface {
   GetAString(): string;
   GetSumFromNumbers(num1: number, num2: number): number;
   GetSumFromOneOrTwoNumbers(num1: number, num2?: number): number;
+  GetWithLambda(lambda: (any: any) => any): number;
 }
 
 class DiTest {
@@ -53,6 +54,10 @@ class DiTest {
 
   GetSumFromOneOrTwoNumbers(num1: number, num2?: number): number {
     return this.dependency.GetSumFromOneOrTwoNumbers(num1, num2);
+  }
+
+  GetWithLambda(lambda: (any: any) => any): number {
+    return this.dependency.GetWithLambda(lambda);
   }
 }
 
@@ -287,5 +292,16 @@ describe('Mock<T>', () => {
     expect(classInstance.GetSumFromOneOrTwoNumbers(1, 2)).not.toEqual(100);
     mockITestInterface.Verify(i => i.GetSumFromOneOrTwoNumbers(Any<number>(), undefined), 1);
     mockITestInterface.Verify(i => i.GetSumFromOneOrTwoNumbers(1, 2), 1);
+  });
+
+  it('should mock a member that takes a lambda as a parameter', () => {
+    mockITestInterface.Setup(i => i.GetWithLambda(a => a.c.d), 2);
+    mockITestInterface.Setup(i => i.GetWithLambda(a => a.b.c), 1);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    const resultOne = classInstance.GetWithLambda(a => a.b.c);
+    expect(resultOne).toEqual(1);
+    const resultTwo = classInstance.GetWithLambda(a => a.c.d);
+    expect(resultTwo).toEqual(2);
   });
 });

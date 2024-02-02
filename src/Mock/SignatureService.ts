@@ -99,6 +99,7 @@ export class SignatureService {
     for (let index = 0; index < (paramStrings ? paramStrings.length : 0); index++) {
       params += (`${index > 0 ? ', ' : ''}p${index}`);
     }
+
     return params;
   }
 }

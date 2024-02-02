@@ -4,6 +4,8 @@ import { FunctionMap } from './FunctionMap';
 import { SignatureMap } from './SignatureMap';
 import { ANY_VALUE } from './Any';
 
+type Member<T> = (func: T) => any;
+
 export class Mock<T> {
   private memberSignatureMaps = new Array<SignatureMap>();
   private object: T = {} as T;
@@ -19,7 +21,7 @@ export class Mock<T> {
    * @param member
    * @param returns
    */
-  public Setup(member: (func: T) => any, returns: any = null): void {
+  public Setup(member: Member<T>, returns: any = null): void {
     this.setup(member, returns);
   }
 
@@ -28,7 +30,7 @@ export class Mock<T> {
    * @param member
    * @param returns
    */
-  public SetupOnce(member: (func: T) => any, returns: any = null): void {
+  public SetupOnce(member: Member<T>, returns: any = null): void {
     this.setup(member, returns, true);
   }
 
@@ -36,7 +38,7 @@ export class Mock<T> {
    * Configure a set of setups that will only resolve on the first time the member is registered
    * @param setups
    */
-  public SetupSequence(setups: [(func: T) => any, any][]): void {
+  public SetupSequence(setups: [Member<T>, any][]): void {
     setups.forEach(setup => {
       this.SetupOnce(setup[0], setup[1]);
     });
@@ -47,7 +49,7 @@ export class Mock<T> {
    * @param member
    * @returns
    */
-  public TimesMemberCalled(member: (func: T) => any): number {
+  public TimesMemberCalled(member: Member<T>): number {
     const memberSignatureMap = SignatureService.GetMemberSignatureMap(member);
     const functionMap: FunctionMap | undefined = this.getFunctionMapsFromSignature(
       memberSignatureMap, memberSignatureMap.functionMaps[0]?.state as any).functionMapForArgs;
@@ -60,7 +62,7 @@ export class Mock<T> {
    * @param member
    * @param times
    */
-  public Verify(member: (func: T) => any, times: Times | number): void {
+  public Verify(member: Member<T>, times: Times | number): void {
     const timesCalled = this.TimesMemberCalled(member);
     const signature = SignatureService.GetMemberSignatureMap(member).signature;
     const memberSignatureMap = this.memberSignatureMaps.find(m => m.signature === signature);
@@ -74,7 +76,7 @@ export class Mock<T> {
     expect(timesCalled).toEqual(times, timesCalled !== times ? '' : undefined);
   }
 
-  private setup(member: (func: T) => any, returns: any = null, singleUse = false): void {
+  private setup(member: Member<T>, returns: any = null, singleUse = false): void {
     const memberSignatureMap = SignatureService.GetMemberSignatureMap(member, returns, singleUse);
     this.updateMemberSignatureMaps(memberSignatureMap);
     const memberName = SignatureService.GetMemberNameFromSignature(memberSignatureMap.signature);
@@ -83,7 +85,9 @@ export class Mock<T> {
       (this.object as any)[memberName] = this.getReturnValueForProperty(memberSignatureMap);
     } else {
       (this.object as any)[memberName] = ((...args: any) => {
-        return this.getReturnForFunction(memberSignatureMap, args)?.();
+        return this.getReturnForFunction(
+          memberSignatureMap,
+          (Array.isArray(args) ? (args.map(a => typeof a === 'function' ? a.toString() : a)) : args))?.();
       });
     }
   }
@@ -109,11 +113,17 @@ export class Mock<T> {
     }) : undefined;
   }
 
-  private getFunctionMapsFromSignature(memberSignatureMap: SignatureMap, args: string[]) {
+  private getFunctionMapsFromSignature(
+    memberSignatureMap: SignatureMap,
+    args: string[]
+  ) {
     const existingMemberSignatureMap = this.memberSignatureMaps.find(s => s.signature === memberSignatureMap.signature);
     const signatureFunctionMaps = existingMemberSignatureMap?.functionMaps;
+    let functionMapForArgs = signatureFunctionMaps?.find(m =>
+      Array.isArray(args) && typeof args?.[0] === 'string' && args[0].includes('function') &&
+      args[0].split(';')[0] === (m.originalSignature?.split('(').slice(1).join('('))) ||
+      signatureFunctionMaps?.find(m => JSON.stringify(m.state) === JSON.stringify(args));
 
-    let functionMapForArgs = signatureFunctionMaps?.find(m => JSON.stringify(m.state) === JSON.stringify(args));
     const functionMapsUsingAny = signatureFunctionMaps?.filter(m => m.state.includes(ANY_VALUE));
 
     if (!functionMapForArgs && functionMapsUsingAny?.length) {
@@ -144,7 +154,7 @@ export class Mock<T> {
     const existingFunctionMap = existingSignatureMap.functionMaps.find(
       fm => JSON.stringify(fm.state) === JSON.stringify(newFunctionMap.state));
 
-    if (existingFunctionMap && !newFunctionMap.singleUse) {
+    if (existingFunctionMap && !newFunctionMap.singleUse && existingFunctionMap.originalSignature === newFunctionMap.originalSignature) {
       const functionMaps = existingSignatureMap.functionMaps;
       functionMaps.splice(functionMaps.indexOf(existingFunctionMap), 1, newFunctionMap);
     } else {
