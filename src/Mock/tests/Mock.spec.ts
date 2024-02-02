@@ -299,9 +299,7 @@ describe('Mock<T>', () => {
     mockITestInterface.Setup(i => i.GetWithLambda(a => a.b.c), 1);
     const classInstance = new DiTest(mockITestInterface.Object);
 
-    const resultOne = classInstance.GetWithLambda(a => a.b.c);
-    expect(resultOne).toEqual(1);
-    const resultTwo = classInstance.GetWithLambda(a => a.c.d);
-    expect(resultTwo).toEqual(2);
+    expect(classInstance.GetWithLambda(a => a.b.c)).toEqual(1);
+    expect(classInstance.GetWithLambda(a => a.c.d)).toEqual(2);
   });
 });

@@ -113,6 +113,21 @@ export class Mock<T> {
     }) : undefined;
   }
 
+  private getPathFromMemberFunctionString(member?: string): string {
+    const regex = /[.][a-zA-Z0-9]*/g;
+    let path = '';
+
+    if (member) {
+      let match: RegExpExecArray | null;
+      while ((match = regex.exec(member)) !== null) {
+        const matchValue = path.length ? match[0] : match[0].replace('.', '');
+        path += matchValue;
+      }
+    }
+
+    return path;
+  }
+
   private getFunctionMapsFromSignature(
     memberSignatureMap: SignatureMap,
     args: string[]
@@ -121,8 +136,8 @@ export class Mock<T> {
     const signatureFunctionMaps = existingMemberSignatureMap?.functionMaps;
     let functionMapForArgs = signatureFunctionMaps?.find(m =>
       Array.isArray(args) && typeof args?.[0] === 'string' && args[0].includes('function') &&
-      args[0].split(';')[0] === (m.originalSignature?.split('(').slice(1).join('('))) ||
-      signatureFunctionMaps?.find(m => JSON.stringify(m.state) === JSON.stringify(args));
+      this.getPathFromMemberFunctionString(args[0]) === this.getPathFromMemberFunctionString(m.originalSignature)
+    ) || signatureFunctionMaps?.find(m => JSON.stringify(m.state) === JSON.stringify(args));
 
     const functionMapsUsingAny = signatureFunctionMaps?.filter(m => m.state.includes(ANY_VALUE));
 
