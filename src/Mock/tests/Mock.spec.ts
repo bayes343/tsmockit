@@ -295,11 +295,23 @@ describe('Mock<T>', () => {
   });
 
   it('should mock a member that takes a lambda as a parameter', () => {
+    mockITestInterface.Setup(i => i.GetWithLambda(a => a.b.a), 0);
+    mockITestInterface.Setup(i => i.GetWithLambda(a => a.b.b), 0);
     mockITestInterface.Setup(i => i.GetWithLambda(a => a.c.d), 2);
     mockITestInterface.Setup(i => i.GetWithLambda(a => a.b.c), 1);
     const classInstance = new DiTest(mockITestInterface.Object);
 
+    classInstance.GetWithLambda(a => a.b.a);
+    classInstance.GetWithLambda(a => a.b.a);
+
     expect(classInstance.GetWithLambda(a => a.b.c)).toEqual(1);
     expect(classInstance.GetWithLambda(a => a.c.d)).toEqual(2);
+    mockITestInterface.Verify(i => i.GetWithLambda(a => a.b.a), 2);
+    mockITestInterface.Verify(i => i.GetWithLambda(a => a.b.c), 1);
+    mockITestInterface.Verify(i => i.GetWithLambda(a => a.c.d), 1);
+    mockITestInterface.Verify(i => i.GetWithLambda(a => a.b.b), Times.Never);
+    // expect(() => {
+    //   classInstance.GetWithLambda(a => a.b.f);
+    // }).toThrowError();
   });
 });

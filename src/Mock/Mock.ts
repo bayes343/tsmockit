@@ -51,8 +51,10 @@ export class Mock<T> {
    */
   public TimesMemberCalled(member: Member<T>): number {
     const memberSignatureMap = SignatureService.GetMemberSignatureMap(member);
+    const args = memberSignatureMap.functionMaps[0]?.state;
     const functionMap: FunctionMap | undefined = this.getFunctionMapsFromSignature(
-      memberSignatureMap, memberSignatureMap.functionMaps[0]?.state as any).functionMapForArgs;
+      memberSignatureMap,
+      Array.isArray(args) ? args.map(a => typeof a === 'function' ? (a as Function).toString() : a) : [args.toString()]).functionMapForArgs;
 
     return functionMap?.timesCalled || 0;
   }
@@ -99,9 +101,11 @@ export class Mock<T> {
 
   private getReturnForFunction(
     memberSignatureMap: SignatureMap,
-    args: any
+    args: Function | string[]
   ): Function | undefined {
-    const { functionMapForArgs, signatureFunctionMaps } = this.getFunctionMapsFromSignature(memberSignatureMap, args);
+    const { functionMapForArgs, signatureFunctionMaps } = this.getFunctionMapsFromSignature(
+      memberSignatureMap,
+      typeof args === 'function' ? [args.toString()] : args);
 
     return functionMapForArgs ? (() => {
       functionMapForArgs.timesCalled++;
