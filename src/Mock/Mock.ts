@@ -99,11 +99,9 @@ export class Mock<T> {
 
   private getReturnForFunction(
     memberSignatureMap: SignatureMap,
-    args: Function | string[]
+    args: (string | Function)[]
   ): Function | undefined {
-    const { functionMapForArgs, signatureFunctionMaps } = this.getFunctionMapsFromSignature(
-      memberSignatureMap,
-      typeof args === 'function' ? [args.toString()] : args);
+    const { functionMapForArgs, signatureFunctionMaps } = this.getFunctionMapsFromSignature(memberSignatureMap, args);
 
     return functionMapForArgs ? (() => {
       functionMapForArgs.timesCalled++;
@@ -132,7 +130,7 @@ export class Mock<T> {
 
   private getFunctionMapsFromSignature(
     memberSignatureMap: SignatureMap,
-    args: string[]
+    args: (string | Function)[]
   ) {
     const existingMemberSignatureMap = this.memberSignatureMaps.find(s => s.signature === memberSignatureMap.signature);
     const signatureFunctionMaps = existingMemberSignatureMap?.functionMaps;
@@ -146,7 +144,7 @@ export class Mock<T> {
     if (!functionMapForArgs && functionMapsUsingAny?.length) {
       functionMapsUsingAny.forEach(element => {
         if (!functionMapForArgs) {
-          const anyTransposedState = new Array<string>();
+          const anyTransposedState = new Array<string | Function>();
           args.forEach((a, i) => anyTransposedState[i] = element.state[i] === ANY_VALUE ? ANY_VALUE : a);
           functionMapForArgs = signatureFunctionMaps?.find(m => JSON.stringify(m.state) === JSON.stringify(anyTransposedState));
         }
