@@ -208,6 +208,12 @@ describe('Mock<T>', () => {
     expect(second).toBeUndefined();
   });
 
+  it('should use a single use setup before other setups', () => {
+    mockITestInterface.SetupOnce(i => i.GetStringFromInt(1), 'one');
+    const classInstance = new DiTest(mockITestInterface.Object);
+    expect(classInstance.GetStringFromInt(1)).toEqual('one');
+  });
+
   it('should define a setup sequence, with each setup only working once', () => {
     mockITestInterface.SetupSequence([
       [i => i.GetAString(), 'one'],

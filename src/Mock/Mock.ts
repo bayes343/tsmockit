@@ -1,3 +1,4 @@
+import { OrderBy } from '../Utility/OrderBy';
 import { Times } from './Times';
 import { SignatureService } from './SignatureService';
 import { FunctionMap } from './FunctionMap';
@@ -179,5 +180,7 @@ export class Mock<T> {
     } else {
       existingSignatureMap.functionMaps.push(newFunctionMap);
     }
+
+    existingSignatureMap.functionMaps = OrderBy(existingSignatureMap.functionMaps, [f => f.singleUse ? 1 : 2]);
   }
 }
