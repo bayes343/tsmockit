@@ -14,7 +14,7 @@
     "dependency injection"
   ],
   "license": "MIT",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Generic mocking library for TypeScript",
   "private": false,
   "main": "./public_api.js",

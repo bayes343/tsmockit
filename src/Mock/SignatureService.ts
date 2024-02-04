@@ -14,7 +14,7 @@ export class SignatureService {
       this.getOperationMemberSignature(value, memberSignature) ||
       this.getPropertyMemberSignature(value, memberSignature);
 
-    const state = this.MemberSignatureIsProperty(memberSignature) ? '' :
+    const state = this.MemberSignatureIsProperty(memberSignature) ? [] :
       SignatureService.getStateForMemberSignature(memberSignature, value);
 
     return {
@@ -40,7 +40,7 @@ export class SignatureService {
 
   private static getOriginalSignature(value: (obj: any) => any): string | undefined {
     let originalSignature = value.toString();
-    originalSignature = originalSignature?.indexOf('i.') ? originalSignature.split('i.')[1] : originalSignature;
+    originalSignature = /.[.]/.test(originalSignature) ? originalSignature.split('.').slice(1).join('.') : originalSignature;
     originalSignature = originalSignature?.indexOf(';') ? originalSignature.split(';')[0] : originalSignature;
     return originalSignature?.trim();
   };
@@ -73,7 +73,7 @@ export class SignatureService {
   }
 
   private static getStateForMemberSignature(memberSignature: string, value: (obj: any) => any) {
-    let state = '';
+    let state: any[] = [];
     const obj = {} as any;
 
     obj[this.GetMemberNameFromSignature(memberSignature)] = ((...args: any) => {
@@ -99,6 +99,7 @@ export class SignatureService {
     for (let index = 0; index < (paramStrings ? paramStrings.length : 0); index++) {
       params += (`${index > 0 ? ', ' : ''}p${index}`);
     }
+
     return params;
   }
 }

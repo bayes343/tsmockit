@@ -26,6 +26,8 @@ interface ITestInterface {
   GetAString(): string;
   GetSumFromNumbers(num1: number, num2: number): number;
   GetSumFromOneOrTwoNumbers(num1: number, num2?: number): number;
+  GetWithLambda(lambda: (any: any) => any): number;
+  GetObjectFromObject(obj: object): object;
 }
 
 class DiTest {
@@ -53,6 +55,14 @@ class DiTest {
 
   GetSumFromOneOrTwoNumbers(num1: number, num2?: number): number {
     return this.dependency.GetSumFromOneOrTwoNumbers(num1, num2);
+  }
+
+  GetWithLambda(lambda: (any: any) => any): number {
+    return this.dependency.GetWithLambda(lambda);
+  }
+
+  GetObjectFromInt(obj: object): object {
+    return this.dependency.GetObjectFromObject(obj);
   }
 }
 
@@ -203,6 +213,22 @@ describe('Mock<T>', () => {
     expect(second).toBeUndefined();
   });
 
+  it('should use a single use setup before other setups', () => {
+    mockITestInterface.SetupOnce(i => i.GetStringFromInt(1), 'one');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetStringFromInt(1)).toEqual('one');
+    expect(classInstance.GetStringFromInt(1)).toEqual('Test');
+  });
+
+  it('should return undefined for an invocation not covered by a setup', () => {
+    mockITestInterface.SetupOnce(i => i.GetStringFromInt(2), 'two');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetStringFromInt(2)).toEqual('two');
+    expect(classInstance.GetStringFromInt(3)).toBeUndefined();
+  });
+
   it('should define a setup sequence, with each setup only working once', () => {
     mockITestInterface.SetupSequence([
       [i => i.GetAString(), 'one'],
@@ -287,5 +313,61 @@ describe('Mock<T>', () => {
     expect(classInstance.GetSumFromOneOrTwoNumbers(1, 2)).not.toEqual(100);
     mockITestInterface.Verify(i => i.GetSumFromOneOrTwoNumbers(Any<number>(), undefined), 1);
     mockITestInterface.Verify(i => i.GetSumFromOneOrTwoNumbers(1, 2), 1);
+  });
+
+  it('should mock a member that takes a lambda as a parameter', () => {
+    mockITestInterface.Setup(i => i.GetWithLambda(a => a.b.a), 0);
+    mockITestInterface.Setup(i => i.GetWithLambda(a => a.b.b), 0);
+    mockITestInterface.Setup(i => i.GetWithLambda(a => a.c.d), 2);
+    mockITestInterface.Setup(i => i.GetWithLambda(a => a.b.c), 1);
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    classInstance.GetWithLambda(a => a.b.a);
+    classInstance.GetWithLambda(a => a.b.a);
+
+    expect(classInstance.GetWithLambda(a => a.b.c)).toEqual(1);
+    expect(classInstance.GetWithLambda(a => a.c.d)).toEqual(2);
+    mockITestInterface.Verify(i => i.GetWithLambda(a => a.b.a), 2);
+    mockITestInterface.Verify(i => i.GetWithLambda(a => a.b.c), 1);
+    mockITestInterface.Verify(i => i.GetWithLambda(a => a.c.d), 1);
+    mockITestInterface.Verify(i => i.GetWithLambda(a => a.b.b), Times.Never);
+    expect(classInstance.GetWithLambda(a => a.b.f)).toBeUndefined();
+  });
+
+  it('should return the correct value from a setup that used a variable', () => {
+    const int = 5;
+    mockITestInterface.Setup(i => i.GetStringFromInt(int), 'five');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetStringFromInt(5)).toEqual('five');
+    expect(classInstance.GetStringFromInt(int)).toEqual('five');
+  });
+
+  enum Values {
+    One = 1,
+    Two = 2,
+    Five = 5,
+    Ten = 10,
+  }
+
+  it('should return the correct value from a setup that used an enum', () => {
+    mockITestInterface.Setup(i => i.GetStringFromInt(Values.Ten), 'ten');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetStringFromInt(10)).toEqual('ten');
+    expect(classInstance.GetStringFromInt(Values.Ten)).toEqual('ten');
+    mockITestInterface.Verify(i => i.GetStringFromInt(Values.Ten), 2);
+  });
+
+  it('should use ANY setups as a last resort', () => {
+    mockITestInterface.Setup(i => i.GetObjectFromObject(Any<object>()), { value: 'any' });
+    mockITestInterface.Setup(i => i.GetObjectFromObject({ value: Values.Ten, test: 11 }), { value: 'ten' });
+    mockITestInterface.Setup(i => i.GetObjectFromObject(Any<object>()), { value: 'any' });
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetObjectFromInt({ value: 10, test: 11 })).toEqual({ value: 'ten' });
+    expect(classInstance.GetObjectFromInt({ value: Values.Ten, test: 11 })).toEqual({ value: 'ten' });
+    mockITestInterface.Verify(i => i.GetObjectFromObject({ value: Values.Ten, test: 11 }), 2);
+    mockITestInterface.Verify(i => i.GetObjectFromObject(Any<object>()), Times.Never);
   });
 });
