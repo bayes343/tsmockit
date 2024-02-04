@@ -92,9 +92,9 @@ export class Mock<T> {
     }
   }
 
-  private getReturnValueForProperty(memberSignatureMap: SignatureMap): Function | undefined {
+  private getReturnValueForProperty(memberSignatureMap: SignatureMap): Function | null {
     return this.memberSignatureMaps.find(
-      s => s.signature === memberSignatureMap.signature)?.functionMaps[0]?.returns;
+      s => s.signature === memberSignatureMap.signature)?.functionMaps[0]?.returns || null;
   }
 
   private getReturnForFunction(
