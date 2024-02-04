@@ -14,7 +14,7 @@ export class SignatureService {
       this.getOperationMemberSignature(value, memberSignature) ||
       this.getPropertyMemberSignature(value, memberSignature);
 
-    const state = this.MemberSignatureIsProperty(memberSignature) ? '' :
+    const state = this.MemberSignatureIsProperty(memberSignature) ? [] :
       SignatureService.getStateForMemberSignature(memberSignature, value);
 
     return {
@@ -73,7 +73,7 @@ export class SignatureService {
   }
 
   private static getStateForMemberSignature(memberSignature: string, value: (obj: any) => any) {
-    let state = '';
+    let state: any[] = [];
     const obj = {} as any;
 
     obj[this.GetMemberNameFromSignature(memberSignature)] = ((...args: any) => {

@@ -181,7 +181,7 @@ export class Mock<T> {
     existingSignatureMap.functionMaps = OrderBy(existingSignatureMap.functionMaps, [f => f.singleUse ? 1 : 2]);
   }
 
-  private getArgumentArray(args: string | Function | (string | Function)[]) {
-    return Array.isArray(args) ? args.map(a => typeof a === 'function' ? a.toString() : a) : [args.toString()];
+  private getArgumentArray(args: (string | Function)[]) {
+    return args.map(a => typeof a === 'function' ? a.toString() : a);
   }
 }
