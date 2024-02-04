@@ -356,6 +356,7 @@ describe('Mock<T>', () => {
 
     expect(classInstance.GetStringFromInt(10)).toEqual('ten');
     expect(classInstance.GetStringFromInt(Values.Ten)).toEqual('ten');
+    mockITestInterface.Verify(i => i.GetStringFromInt(Values.Ten), 2);
   });
 
   it('should use ANY setups as a last resort', () => {
@@ -366,5 +367,7 @@ describe('Mock<T>', () => {
 
     expect(classInstance.GetObjectFromInt({ value: 10, test: 11 })).toEqual({ value: 'ten' });
     expect(classInstance.GetObjectFromInt({ value: Values.Ten, test: 11 })).toEqual({ value: 'ten' });
+    mockITestInterface.Verify(i => i.GetObjectFromObject({ value: Values.Ten, test: 11 }), 2);
+    mockITestInterface.Verify(i => i.GetObjectFromObject(Any<object>()), Times.Never);
   });
 });
