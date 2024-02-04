@@ -211,7 +211,17 @@ describe('Mock<T>', () => {
   it('should use a single use setup before other setups', () => {
     mockITestInterface.SetupOnce(i => i.GetStringFromInt(1), 'one');
     const classInstance = new DiTest(mockITestInterface.Object);
+
     expect(classInstance.GetStringFromInt(1)).toEqual('one');
+    expect(classInstance.GetStringFromInt(1)).toEqual('Test');
+  });
+
+  it('should return undefined for an invocation not covered by a setup', () => {
+    mockITestInterface.SetupOnce(i => i.GetStringFromInt(2), 'two');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetStringFromInt(2)).toEqual('two');
+    expect(classInstance.GetStringFromInt(3)).toBeUndefined();
   });
 
   it('should define a setup sequence, with each setup only working once', () => {
@@ -316,8 +326,6 @@ describe('Mock<T>', () => {
     mockITestInterface.Verify(i => i.GetWithLambda(a => a.b.c), 1);
     mockITestInterface.Verify(i => i.GetWithLambda(a => a.c.d), 1);
     mockITestInterface.Verify(i => i.GetWithLambda(a => a.b.b), Times.Never);
-    // expect(() => {
-    //   classInstance.GetWithLambda(a => a.b.f);
-    // }).toThrowError();
+    expect(classInstance.GetWithLambda(a => a.b.f)).toBeUndefined();
   });
 });
