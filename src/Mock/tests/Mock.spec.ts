@@ -27,6 +27,7 @@ interface ITestInterface {
   GetSumFromNumbers(num1: number, num2: number): number;
   GetSumFromOneOrTwoNumbers(num1: number, num2?: number): number;
   GetWithLambda(lambda: (any: any) => any): number;
+  GetObjectFromObject(obj: object): object;
 }
 
 class DiTest {
@@ -58,6 +59,10 @@ class DiTest {
 
   GetWithLambda(lambda: (any: any) => any): number {
     return this.dependency.GetWithLambda(lambda);
+  }
+
+  GetObjectFromInt(obj: object): object {
+    return this.dependency.GetObjectFromObject(obj);
   }
 }
 
@@ -327,5 +332,39 @@ describe('Mock<T>', () => {
     mockITestInterface.Verify(i => i.GetWithLambda(a => a.c.d), 1);
     mockITestInterface.Verify(i => i.GetWithLambda(a => a.b.b), Times.Never);
     expect(classInstance.GetWithLambda(a => a.b.f)).toBeUndefined();
+  });
+
+  it('should return the correct value from a setup that used a variable', () => {
+    const int = 5;
+    mockITestInterface.Setup(i => i.GetStringFromInt(int), 'five');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetStringFromInt(5)).toEqual('five');
+    expect(classInstance.GetStringFromInt(int)).toEqual('five');
+  });
+
+  enum Values {
+    One = 1,
+    Two = 2,
+    Five = 5,
+    Ten = 10,
+  }
+
+  it('should return the correct value from a setup that used an enum', () => {
+    mockITestInterface.Setup(i => i.GetStringFromInt(Values.Ten), 'ten');
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetStringFromInt(10)).toEqual('ten');
+    expect(classInstance.GetStringFromInt(Values.Ten)).toEqual('ten');
+  });
+
+  it('should use ANY setups as a last resort', () => {
+    mockITestInterface.Setup(i => i.GetObjectFromObject(Any<object>()), { value: 'any' });
+    mockITestInterface.Setup(i => i.GetObjectFromObject({ value: Values.Ten, test: 11 }), { value: 'ten' });
+    mockITestInterface.Setup(i => i.GetObjectFromObject(Any<object>()), { value: 'any' });
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetObjectFromInt({ value: 10, test: 11 })).toEqual({ value: 'ten' });
+    expect(classInstance.GetObjectFromInt({ value: Values.Ten, test: 11 })).toEqual({ value: 'ten' });
   });
 });
