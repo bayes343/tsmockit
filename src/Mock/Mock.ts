@@ -54,8 +54,7 @@ export class Mock<T> {
     const memberSignatureMap = SignatureService.GetMemberSignatureMap(member);
     const args = memberSignatureMap.functionMaps[0]?.state;
     const functionMap: FunctionMap | undefined = this.getFunctionMapsFromSignature(
-      memberSignatureMap,
-      Array.isArray(args) ? args.map(a => typeof a === 'function' ? a.toString() : a) : [args.toString()]).functionMapForArgs;
+      memberSignatureMap, this.getArgumentString(args)).functionMapForArgs;
 
     return functionMap?.timesCalled || 0;
   }
@@ -88,9 +87,7 @@ export class Mock<T> {
       (this.object as any)[memberName] = this.getReturnValueForProperty(memberSignatureMap);
     } else {
       (this.object as any)[memberName] = ((...args: any) => {
-        return this.getReturnForFunction(
-          memberSignatureMap,
-          (Array.isArray(args) ? (args.map(a => typeof a === 'function' ? a.toString() : a)) : args))?.();
+        return this.getReturnForFunction(memberSignatureMap, this.getArgumentString(args))?.();
       });
     }
   }
@@ -182,5 +179,9 @@ export class Mock<T> {
     }
 
     existingSignatureMap.functionMaps = OrderBy(existingSignatureMap.functionMaps, [f => f.singleUse ? 1 : 2]);
+  }
+
+  private getArgumentString(args: string | Function | (string | Function)[]) {
+    return Array.isArray(args) ? args.map(a => typeof a === 'function' ? a.toString() : a) : [args.toString()];
   }
 }
