@@ -75,7 +75,7 @@ export class Mock<T> {
         memberSignatureMap?.functionMaps.map(m => `${m.originalSignature} x ${m.timesCalled}`));
     }
 
-    expect(timesCalled).toEqual(times, timesCalled !== times ? '' : undefined);
+    expect(timesCalled).toEqual(times);
   }
 
   private setup(member: Member<T>, returns: any = null, singleUse = false): void {
@@ -92,9 +92,9 @@ export class Mock<T> {
     }
   }
 
-  private getReturnValueForProperty(memberSignatureMap: SignatureMap): Function | null {
+  private getReturnValueForProperty(memberSignatureMap: SignatureMap): Function | undefined {
     return this.memberSignatureMaps.find(
-      s => s.signature === memberSignatureMap.signature)?.functionMaps[0]?.returns || null;
+      s => s.signature === memberSignatureMap.signature)?.functionMaps[0]?.returns;
   }
 
   private getReturnForFunction(
