@@ -370,4 +370,12 @@ describe('Mock<T>', () => {
     mockITestInterface.Verify(i => i.GetObjectFromObject({ value: Values.Ten, test: 11 }), 2);
     mockITestInterface.Verify(i => i.GetObjectFromObject(Any<object>()), Times.Never);
   });
+
+  it('should be able to use a setup with "?" operators', () => {
+    mockITestInterface.Setup(i => i.GetWithLambda(a => a?.b?.c?.d), { value: 'asdf' });
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetWithLambda(a => a?.b?.c?.d)).toEqual({ value: 'asdf' } as any);
+    mockITestInterface.Verify(i => i.GetWithLambda(a => a?.b?.c?.d), Times.Once);
+  });
 });

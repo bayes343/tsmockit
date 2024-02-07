@@ -41,7 +41,6 @@ export class SignatureService {
   private static getOriginalSignature(value: (obj: any) => any): string | undefined {
     let originalSignature = value.toString();
     originalSignature = /.[.]/.test(originalSignature) ? originalSignature.split('.').slice(1).join('.') : originalSignature;
-    originalSignature = originalSignature?.indexOf(';') ? originalSignature.split(';')[0] : originalSignature;
     return originalSignature?.trim();
   };
 
