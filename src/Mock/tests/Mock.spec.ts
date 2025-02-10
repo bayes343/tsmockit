@@ -378,4 +378,12 @@ describe('Mock<T>', () => {
     expect(classInstance.GetWithLambda(a => a?.b?.c?.d)).toEqual({ value: 'asdf' } as any);
     mockITestInterface.Verify(i => i.GetWithLambda(a => a?.b?.c?.d), Times.Once);
   });
+
+  it('should be able to use a setup with "?" operators - partical test', () => {
+    mockITestInterface.Setup(i => i.GetWithLambda(s => s.purchaseProducts?.primary?.attributes.paymentFrequency), { value: 'asdf' });
+    const classInstance = new DiTest(mockITestInterface.Object);
+
+    expect(classInstance.GetWithLambda(s => s.purchaseProducts?.primary?.attributes.paymentFrequency)).toEqual({ value: 'asdf' } as any);
+    mockITestInterface.Verify(i => i.GetWithLambda(s => s.purchaseProducts?.primary?.attributes.paymentFrequency), Times.Once);
+  });
 });
